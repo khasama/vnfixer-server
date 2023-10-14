@@ -4,8 +4,11 @@ import { IUser, RoleType } from "../constants";
 
 export class User extends Model implements IUser {
   id: number;
-  firstName: string;
-  lastName: string;
+  email: string;
+  password: string;
+  phone: string;
+  address: string;
+  fullName: string;
   role: RoleType;
 }
 
@@ -16,11 +19,21 @@ User.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    firstName: {
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    lastName: {
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    phone: {
+      type: DataTypes.STRING,
+    },
+    address: {
+      type: DataTypes.STRING,
+    },
+    fullName: {
       type: DataTypes.STRING,
     },
     role: {

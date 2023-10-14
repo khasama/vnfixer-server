@@ -4,6 +4,7 @@ import express from "express";
 import { BaseRouter } from "./BaseRouter";
 import { healthCheckRouter } from "./HealthCheckRouter";
 import { userRouter } from "./UserRoute";
+import { authRouter } from "./AuthRoute";
 
 class MasterRouter extends BaseRouter {
   constructor() {
@@ -36,6 +37,7 @@ class MasterRouter extends BaseRouter {
   protected init() {
     this.router.use("/health-check", healthCheckRouter);
     this.router.use("/users", userRouter);
+    this.router.use("/auth", authRouter);
   }
 }
 
