@@ -1,10 +1,10 @@
 import cors from "cors";
 import fileUpload from "express-fileupload";
 import express from "express";
-import { BaseRouter } from "./BaseRouter";
-import { healthCheckRouter } from "./HealthCheckRouter";
-import { userRouter } from "./UserRoute";
-import { authRouter } from "./AuthRoute";
+import { BaseRouter } from "./base.router";
+import { healthCheckRouter } from "./health-check.router";
+import { userRouter } from "./user.route";
+import { authRouter } from "./auth.route";
 
 class MasterRouter extends BaseRouter {
   constructor() {

@@ -1,5 +1,5 @@
 import { authController } from "../controllers/auth.controller";
-import { BaseRouter } from "./BaseRouter";
+import { BaseRouter } from "./base.router";
 
 class AuthRouter extends BaseRouter {
   private _controller = authController;

@@ -1,16 +1,13 @@
 import bcrypt from "bcrypt";
 import { IAuth } from "../../constants";
 import { LoginDto } from "../../dtos/auth/login.dto";
-import { User } from "../../models/Users";
+import { User } from "../../models/users.model";
 import { IAuthService } from "./IAuthService";
 import { RegisterDto } from "../../dtos/auth/register.dto";
 import { genAccessToken } from "../../utils/jwt";
 import { plainToClass } from "class-transformer";
 import { UserDto } from "../../dtos/user/user.dto";
 
-/**
- * @description AuthServive.
- */
 class AuthServive implements IAuthService {
   private userModel = User;
 

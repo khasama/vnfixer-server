@@ -1,10 +1,7 @@
 import { IUser } from "../../constants";
-import { User } from "../../models/Users";
+import { User } from "../../models/users.model";
 import { IUserService } from "./IUserService";
 
-/**
- * @description UserServive.
- */
 class UserServive implements IUserService {
   private userModel = User;
 
