@@ -1,5 +1,5 @@
-import { BaseRouter } from "./BaseRouter";
-import { healthCheckController } from "../controllers/HealthCheckController";
+import { BaseRouter } from "./base.router";
+import { healthCheckController } from "../controllers/health-check.controller";
 
 /**
  * @description HealthCheckRouter.

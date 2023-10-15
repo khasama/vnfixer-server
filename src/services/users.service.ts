@@ -1,10 +1,10 @@
-import { IUser } from "../../constants";
-import { User } from "../../models/Users";
-import { IUserService } from "./IUserService";
+import { IUser } from "../constants";
+import { User } from "../models/users.model";
 
-/**
- * @description UserServive.
- */
+interface IUserService {
+  getAll(): Promise<IUser[]>;
+}
+
 class UserServive implements IUserService {
   private userModel = User;
 
