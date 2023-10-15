@@ -5,7 +5,6 @@ import { instanceToPlain } from "class-transformer";
 export async function genAccessToken(user: UserDto): Promise<string> {
   return new Promise((resolve, rejects) => {
     const payload = instanceToPlain(user);
-    console.log({ payload });
 
     const secret = process.env.ACCESS_TOKEN;
 
@@ -20,7 +19,7 @@ export async function genAccessToken(user: UserDto): Promise<string> {
   });
 }
 
-export async function genRefreshToken(user): Promise<string> {
+export async function genRefreshToken(user: UserDto): Promise<string> {
   return new Promise((resolve, rejects) => {
     const payload = user;
 

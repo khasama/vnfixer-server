@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { authService } from "../services/auth/auth.service";
+import { authService } from "../services/auth.service";
 import { LoginDto } from "../dtos/auth/login.dto";
 import { RegisterDto } from "../dtos/auth/register.dto";
-import { catchAsync } from "../utils/catchAsync";
+import { catchAsync } from "../utils/catch-async";
 
 class AuthController {
   private _service = authService;

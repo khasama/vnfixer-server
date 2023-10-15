@@ -1,7 +1,9 @@
-import { IHealthCheckService } from "./IHealthCheckService";
+interface IHealthCheckService {
+  default();
+}
 
 class HealthCheckServive implements IHealthCheckService {
-  default() {
+  async default() {
     return { data: "khapro" };
   }
 }

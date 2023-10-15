@@ -1,4 +1,5 @@
 import { authController } from "../controllers/auth.controller";
+import { authValidate } from "../middlewares/validate";
 import { BaseRouter } from "./base.router";
 
 class AuthRouter extends BaseRouter {
@@ -9,9 +10,9 @@ class AuthRouter extends BaseRouter {
     this.init();
   }
   protected init() {
-    this.router.post("/login", this._controller.login);
+    this.router.post("/login", authValidate, this._controller.login);
+    this.router.post("/register", authValidate, this._controller.register);
     this.router.post("/logout", this._controller.logout);
-    this.router.post("/register", this._controller.register);
   }
 }
 
