@@ -1,5 +1,5 @@
 import { IUser } from "../constants";
-import { User } from "../models/users.model";
+import { User } from "../models";
 
 interface IUserService {
   getAll(): Promise<IUser[]>;

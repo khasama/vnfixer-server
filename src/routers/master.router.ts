@@ -6,6 +6,10 @@ import { healthCheckRouter } from "./health-check.router";
 import { userRouter } from "./user.route";
 import { authRouter } from "./auth.route";
 import { errorController } from "../controllers/error.controller";
+import { categoryRouter } from "./category.route";
+import { agencyRouter } from "./agency.route";
+import { branchRouter } from "./branch.route";
+import { requestRouter } from "./request.route";
 
 class MasterRouter extends BaseRouter {
   constructor() {
@@ -39,6 +43,10 @@ class MasterRouter extends BaseRouter {
     this.router.use("/health-check", healthCheckRouter);
     this.router.use("/users", userRouter);
     this.router.use("/auth", authRouter);
+    this.router.use("/categories", categoryRouter);
+    this.router.use("/agencies", agencyRouter);
+    this.router.use("/branches", branchRouter);
+    this.router.use("/requests", requestRouter);
 
     this.router.use(errorController.error);
   }

@@ -1,0 +1,20 @@
+import { agencyController } from "../controllers/agency.controller";
+import { agencyValidate } from "../middlewares/validate";
+import { BaseRouter } from "./base.router";
+
+class AgencyRouter extends BaseRouter {
+  private _controller = agencyController;
+
+  constructor() {
+    super();
+    this.init();
+  }
+  protected init() {
+    this.router.get("/", this._controller.getAll);
+    this.router.get("/:id", this._controller.getOne);
+    this.router.post("/", agencyValidate, this._controller.create);
+    this.router.put("/:id", agencyValidate, this._controller.update);
+  }
+}
+
+export const agencyRouter = new AgencyRouter().router;

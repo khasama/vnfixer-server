@@ -2,7 +2,7 @@ import { IUser, RoleType } from "../../constants";
 import { Exclude } from "class-transformer";
 
 export class UserDto implements IUser {
-  id: number;
+  id?: number;
 
   email: string;
 
@@ -16,4 +16,10 @@ export class UserDto implements IUser {
   fullName?: string;
 
   role: RoleType;
+
+  imageUrl?: string;
+
+  active: boolean;
+
+  branchId: number;
 }

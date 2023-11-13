@@ -1,5 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { authSchema } from "../utils/joi.schema";
+import {
+  agencySchema,
+  authSchema,
+  branchSchema,
+  categorySchema,
+  requestSchema,
+} from "../utils/joi.schema";
 import Joi from "joi";
 
 function validate(schema: Joi.ObjectSchema<any>) {
@@ -13,3 +19,7 @@ function validate(schema: Joi.ObjectSchema<any>) {
 }
 
 export const authValidate = validate(authSchema);
+export const categoryValidate = validate(categorySchema);
+export const agencyValidate = validate(agencySchema);
+export const branchValidate = validate(branchSchema);
+export const requestValidate = validate(requestSchema);

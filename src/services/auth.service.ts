@@ -1,12 +1,12 @@
 import bcrypt from "bcrypt";
 import { IAuth } from "../constants";
 import { LoginDto } from "../dtos/auth/login.dto";
-import { User } from "../models/users.model";
 import { RegisterDto } from "../dtos/auth/register.dto";
 import { genAccessToken } from "../utils/jwt";
 import { plainToClass } from "class-transformer";
 import { UserDto } from "../dtos/user/user.dto";
 import createError from "http-errors";
+import { User } from "../models";
 
 interface IAuthService {
   login(body: LoginDto): Promise<IAuth>;
