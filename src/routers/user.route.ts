@@ -1,5 +1,5 @@
-import { userController } from "../controllers/UserController";
-import { BaseRouter } from "./BaseRouter";
+import { userController } from "../controllers/user.controller";
+import { BaseRouter } from "./base.router";
 
 class UserRouter extends BaseRouter {
   private _controller = userController;

@@ -4,9 +4,15 @@ import { IUser, RoleType } from "../constants";
 
 export class User extends Model implements IUser {
   id: number;
-  firstName: string;
-  lastName: string;
+  email: string;
+  password: string;
+  phone: string;
+  address: string;
+  fullName: string;
+  imageUrl: string;
+  active: boolean;
   role: RoleType;
+  branchId: number | null;
 }
 
 User.init(
@@ -16,21 +22,41 @@ User.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    firstName: {
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    lastName: {
+    password: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    phone: {
+      type: DataTypes.STRING,
+    },
+    address: {
+      type: DataTypes.STRING,
+    },
+    fullName: {
+      type: DataTypes.STRING,
+    },
+    imageUrl: {
+      type: DataTypes.STRING,
+    },
+    active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
     },
     role: {
       type: DataTypes.ENUM({ values: Object.values(RoleType) }),
       defaultValue: RoleType.CUSTOMER,
     },
+    branchId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   },
   {
     sequelize,
-    underscored: true,
     modelName: "User",
     tableName: "tb_user",
   }

@@ -1,5 +1,4 @@
 import { Server } from "./server";
-import express from "express";
 // import mongoose from "mongoose";
 import * as swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./utils/swagger.json";
