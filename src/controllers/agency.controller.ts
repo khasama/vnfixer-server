@@ -8,7 +8,14 @@ class AgencyController {
   private _service = agencyService;
 
   getAll = catchAsync(async (req: Request, res: Response) => {
-    const result = await this._service.getAll();
+    const page = parseInt(String(req.query.page)) || 1;
+    const limit = parseInt(String(req.query.limit)) || 10;
+    const sort = String(req.query.page);
+    const result = await this._service.getAllWithPagination({
+      page,
+      limit,
+      sort,
+    });
     const respone = new BaseRespone("success", HttpError.SUCCESS, result);
     return res.status(HttpError.SUCCESS).json(respone);
   });

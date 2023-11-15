@@ -3,10 +3,13 @@ import { toData } from "../common/mappers";
 import createHttpError from "http-errors";
 import { AgencyDto } from "../dtos/agency/agency.dto";
 import { categoryService } from "./category.service";
+import { PaginationOptions, PaginationProps } from "../constants";
+import { Op } from "sequelize";
 
 interface IAgencyService {
   getAll(): Promise<Agency[]>;
-  getOne(id: number): Promise<Agency>;
+  findOne(filter): Promise<Agency>;
+  getOne(filter): Promise<Agency>;
   create(agencyDto: AgencyDto): Promise<Agency>;
   update(id: number, agencyDto: AgencyDto): Promise<Agency>;
   addCategoriesForAgency(categories: number[], agencyId: number): Promise<void>;
@@ -38,9 +41,14 @@ class AgencyServive implements IAgencyService {
     return agencies;
   }
 
-  async getOne(id: number): Promise<Agency> {
-    const agency = await this.agencyModel.findOne({
-      where: { id },
+  async getAllWithPagination(
+    option: PaginationOptions
+  ): Promise<PaginationProps> {
+    const skip = (option.page - 1) * option.limit;
+    const { count } = await this.agencyModel.findAndCountAll();
+    const agencies = await this.agencyModel.findAll({
+      limit: option.limit,
+      offset: skip,
       include: [
         {
           model: Category,
@@ -53,6 +61,29 @@ class AgencyServive implements IAgencyService {
         },
       ],
     });
+    return { entries: agencies, total: count };
+  }
+
+  async findOne(filter): Promise<Agency> {
+    const agency = await this.agencyModel.findOne({
+      where: filter,
+      include: [
+        {
+          model: Category,
+          as: "categories",
+          attributes: ["id", "name", "description"],
+        },
+        {
+          model: Branch,
+          as: "branches",
+        },
+      ],
+    });
+    return agency;
+  }
+
+  async getOne(filter): Promise<Agency> {
+    const agency = await this.findOne(filter);
     if (!agency) {
       throw createHttpError.NotFound("Agency not found");
     }
@@ -60,30 +91,45 @@ class AgencyServive implements IAgencyService {
   }
 
   async create(agencyDto: AgencyDto): Promise<Agency> {
-    const isAllExist = await this.categoryService.isAllExist(
-      agencyDto.categories
-    );
-    if (!isAllExist) {
-      throw new createHttpError.BadRequest(
-        "One of list categories not exist !!!"
+    const agency = await this.findOne({ name: agencyDto.name });
+    if (agency) {
+      throw new createHttpError.BadRequest("Agency name exist !!!");
+    }
+    if (agencyDto.categories) {
+      const isAllExist = await this.categoryService.isAllExist(
+        agencyDto.categories
       );
+      if (!isAllExist) {
+        throw new createHttpError.BadRequest(
+          "One of list categories not exist !!!"
+        );
+      }
     }
     const newAgency = await this.agencyModel.create(toData(agencyDto));
 
     if (agencyDto.categories && agencyDto.categories.length > 0) {
       await this.addCategoriesForAgency(agencyDto.categories, newAgency.id);
     }
-    return await this.getOne(newAgency.id);
+    return await this.getOne({ id: newAgency.id });
   }
 
   async update(id: number, agencyDto: AgencyDto): Promise<Agency> {
-    const isAllExist = await this.categoryService.isAllExist(
-      agencyDto.categories
-    );
-    if (!isAllExist) {
-      throw new createHttpError.BadRequest(
-        "One of list categories not exist !!!"
+    const agency = await this.findOne({
+      name: agencyDto.name,
+      id: { [Op.ne]: id },
+    });
+    if (agency) {
+      throw new createHttpError.BadRequest("Agency name exist !!!");
+    }
+    if (agencyDto.categories) {
+      const isAllExist = await this.categoryService.isAllExist(
+        agencyDto.categories
       );
+      if (!isAllExist) {
+        throw new createHttpError.BadRequest(
+          "One of list categories not exist !!!"
+        );
+      }
     }
     const oldCategories = await this.agencyCategoryModel.findAll({
       where: {
@@ -114,8 +160,8 @@ class AgencyServive implements IAgencyService {
     if (count === 0) {
       throw createHttpError.NotFound("Not found");
     }
-    const agency = await this.getOne(id);
-    return agency;
+    const agencyUpdated = await this.getOne({ id });
+    return agencyUpdated;
   }
 
   async addCategoriesForAgency(categories: number[], agencyId: number) {
