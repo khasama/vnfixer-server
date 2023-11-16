@@ -139,3 +139,14 @@ export interface IRequest {
   branchId: number | null;
   userId: number;
 }
+
+export interface PaginationProps {
+  total: number;
+  entries: object[];
+}
+
+export interface PaginationOptions {
+  sort: string;
+  page: number;
+  limit: number;
+}
