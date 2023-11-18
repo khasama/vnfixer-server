@@ -11,7 +11,9 @@ class RequestRouter extends BaseRouter {
     this.init();
   }
   protected init() {
+    this.router.get("/", this._controller.getAll);
     this.router.get("/:id", this._controller.getOne);
+    this.router.patch("/:id", this._controller.changeStatus);
     this.router.post(
       "/",
       verifyUser(),
