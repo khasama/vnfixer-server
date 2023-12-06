@@ -1,4 +1,4 @@
-import { Agency, AgencyCategory, Branch, Category } from "../models";
+import { Agency, Branch, Category } from "../models";
 import { toData } from "../common/mappers";
 import createHttpError from "http-errors";
 import { AgencyDto } from "../dtos/agency/agency.dto";
@@ -8,20 +8,18 @@ import { Op } from "sequelize";
 
 interface IAgencyService {
   getAll(): Promise<Agency[]>;
+  getAllWithPagination(
+    filter,
+    option: PaginationOptions
+  ): Promise<PaginationProps>;
   findOne(filter): Promise<Agency>;
   getOne(filter): Promise<Agency>;
   create(agencyDto: AgencyDto): Promise<Agency>;
   update(id: number, agencyDto: AgencyDto): Promise<Agency>;
-  addCategoriesForAgency(categories: number[], agencyId: number): Promise<void>;
-  removeCategoriesForAgency(
-    categories: number[],
-    agencyId: number
-  ): Promise<void>;
 }
 
 class AgencyServive implements IAgencyService {
   private agencyModel = Agency;
-  private agencyCategoryModel = AgencyCategory;
   private categoryService = categoryService;
 
   async getAll(): Promise<Agency[]> {
@@ -42,17 +40,19 @@ class AgencyServive implements IAgencyService {
   }
 
   async getAllWithPagination(
+    filter,
     option: PaginationOptions
   ): Promise<PaginationProps> {
     const skip = (option.page - 1) * option.limit;
     const { count } = await this.agencyModel.findAndCountAll();
     const agencies = await this.agencyModel.findAll({
+      where: filter,
       limit: option.limit,
       offset: skip,
       include: [
         {
           model: Category,
-          as: "categories",
+          as: "category",
           attributes: ["id", "name", "description"],
         },
         {
@@ -70,7 +70,7 @@ class AgencyServive implements IAgencyService {
       include: [
         {
           model: Category,
-          as: "categories",
+          as: "category",
           attributes: ["id", "name", "description"],
         },
         {
@@ -95,21 +95,9 @@ class AgencyServive implements IAgencyService {
     if (agency) {
       throw new createHttpError.BadRequest("Agency name exist !!!");
     }
-    if (agencyDto.categories) {
-      const isAllExist = await this.categoryService.isAllExist(
-        agencyDto.categories
-      );
-      if (!isAllExist) {
-        throw new createHttpError.BadRequest(
-          "One of list categories not exist !!!"
-        );
-      }
-    }
-    const newAgency = await this.agencyModel.create(toData(agencyDto));
+    await this.categoryService.getOne(agencyDto.categoryId);
 
-    if (agencyDto.categories && agencyDto.categories.length > 0) {
-      await this.addCategoriesForAgency(agencyDto.categories, newAgency.id);
-    }
+    const newAgency = await this.agencyModel.create(toData(agencyDto));
     return await this.getOne({ id: newAgency.id });
   }
 
@@ -121,37 +109,7 @@ class AgencyServive implements IAgencyService {
     if (agency) {
       throw new createHttpError.BadRequest("Agency name exist !!!");
     }
-    if (agencyDto.categories) {
-      const isAllExist = await this.categoryService.isAllExist(
-        agencyDto.categories
-      );
-      if (!isAllExist) {
-        throw new createHttpError.BadRequest(
-          "One of list categories not exist !!!"
-        );
-      }
-    }
-    const oldCategories = await this.agencyCategoryModel.findAll({
-      where: {
-        agencyId: id,
-      },
-      attributes: ["categoryId"],
-      raw: true,
-    });
-    const oldCategoriesMapped = oldCategories.map((item) => item.categoryId);
-    if (agencyDto.categories && agencyDto.categories.length > 0) {
-      for (const category of agencyDto.categories) {
-        if (oldCategories.some((e) => e.categoryId === category)) {
-          agencyDto.categories.splice(
-            agencyDto.categories.indexOf(category),
-            1
-          );
-          oldCategoriesMapped.splice(oldCategoriesMapped.indexOf(category), 1);
-        }
-      }
-      await this.addCategoriesForAgency(agencyDto.categories, id);
-      await this.removeCategoriesForAgency(oldCategoriesMapped, id);
-    }
+    await this.categoryService.getOne(agencyDto.categoryId);
     const [count] = await this.agencyModel.update(toData(agencyDto), {
       where: {
         id,
@@ -162,26 +120,6 @@ class AgencyServive implements IAgencyService {
     }
     const agencyUpdated = await this.getOne({ id });
     return agencyUpdated;
-  }
-
-  async addCategoriesForAgency(categories: number[], agencyId: number) {
-    for (const category of categories) {
-      await this.agencyCategoryModel.create({
-        agencyId: agencyId,
-        categoryId: category,
-      });
-    }
-  }
-
-  async removeCategoriesForAgency(categories: number[], agencyId: number) {
-    for (const category of categories) {
-      await this.agencyCategoryModel.destroy({
-        where: {
-          agencyId: agencyId,
-          categoryId: category,
-        },
-      });
-    }
   }
 }
 

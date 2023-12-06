@@ -12,7 +12,10 @@ import { categoryService } from "./category.service";
 
 interface IRequestService {
   getAll(): Promise<Request[]>;
-  getAllWithPagination(option: PaginationOptions): Promise<PaginationProps>;
+  getAllWithPagination(
+    filter,
+    option: PaginationOptions
+  ): Promise<PaginationProps>;
   findOne(filter): Promise<Request>;
   getOne(id: number): Promise<Request>;
   create(userId: number, requestDto: RequestDto): Promise<Request>;
@@ -43,11 +46,13 @@ class RequestServive implements IRequestService {
   }
 
   async getAllWithPagination(
+    filter,
     option: PaginationOptions
   ): Promise<PaginationProps> {
     const skip = (option.page - 1) * option.limit;
     const { count } = await this.requestModel.findAndCountAll();
     const agencies = await this.requestModel.findAll({
+      where: filter,
       limit: option.limit,
       offset: skip,
       include: [
@@ -79,6 +84,7 @@ class RequestServive implements IRequestService {
           as: "branch",
         },
       ],
+      raw: true,
     });
     return agency;
   }
@@ -131,6 +137,22 @@ class RequestServive implements IRequestService {
       throw createHttpError.NotFound("Not found");
     }
     return await this.getOne({ id });
+  }
+
+  async takeRequest(branchId: number, requestId: number) {
+    if (!branchId || !requestId) {
+      throw createHttpError.BadRequest("Missing param(s)");
+    }
+    const request = await this.getOne({ id: requestId });
+    if (request.status !== RequestStatus.PENDING) {
+      throw createHttpError.BadRequest("Request not available");
+    }
+    const dataUpdate = {
+      ...request,
+      status: RequestStatus.ACCEPT,
+      branchId,
+    };
+    await this.update(requestId, dataUpdate);
   }
 }
 

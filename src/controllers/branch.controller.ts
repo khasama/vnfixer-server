@@ -28,6 +28,14 @@ class BranchController {
     const respone = new BaseRespone("success", HttpError.SUCCESS, result);
     return res.status(HttpError.SUCCESS).json(respone);
   });
+
+  addStaff = catchAsync(async (req: Request, res: Response) => {
+    const { branchId } = req["user"];
+    const { userId, role } = req.body;
+    await this._service.addStaff(parseInt(branchId), parseInt(userId), role);
+    const respone = new BaseRespone("success", HttpError.SUCCESS);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
 }
 
 export const branchController = new BranchController();

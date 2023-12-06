@@ -4,6 +4,19 @@ export enum RoleType {
   AGENCY = "AGENCY",
 }
 
+export enum RatingPoint {
+  VERY_BAD = 1,
+  BAD = 2,
+  NORMAL = 3,
+  GOOD = 4,
+  VERY_GOOD = 5,
+}
+
+export enum AgencyRoleType {
+  STAFF = "STAFF",
+  MANAGER = "MANAGER",
+}
+
 export enum RequestStatus {
   PENDING = "PENDING",
   ACCEPT = "ACCEPT",
@@ -11,9 +24,15 @@ export enum RequestStatus {
   CANCEL = "CANCEL",
 }
 
+export enum StaffRequestStatus {
+  PENDING = "PENDING",
+  ACCEPT = "ACCEPT",
+  REJECT = "REJECT",
+}
+
 export const cities = [
   "An Giang",
-  "Bà Rịa-Vũng Tàu",
+  "Bà Rịa - Vũng Tàu",
   "Bắc Giang",
   "Bắc Kạn",
   "Bạc Liêu",
@@ -40,7 +59,7 @@ export const cities = [
   "Hải Dương",
   "Hải Phòng",
   "Hậu Giang",
-  "TP. Hồ Chí Minh",
+  "Hồ Chí Minh",
   "Hòa Bình",
   "Hưng Yên",
   "Khánh Hòa",
@@ -68,7 +87,7 @@ export const cities = [
   "Thái Bình",
   "Thái Nguyên",
   "Thanh Hóa",
-  "Thừa Thiên - Huế",
+  "Thừa Thiên Huế",
   "Tiền Giang",
   "Trà Vinh",
   "Tuyên Quang",
@@ -101,6 +120,7 @@ export interface IUser {
   active: boolean;
   role: RoleType;
   branchId: number | null;
+  agencyRole: AgencyRoleType | null;
 }
 
 export interface ICategory {
@@ -113,7 +133,7 @@ export interface IAgency {
   id?: number;
   name: string;
   description?: string;
-  categories?: number[];
+  categoryId: number;
 }
 
 export interface IAgencyCategory {
@@ -132,12 +152,28 @@ export interface IRequest {
   id?: number;
   title: string;
   description: string;
+  city: string;
   location: string;
   expectDate: Date;
   status: string;
   categoryId: number;
   branchId: number | null;
   userId: number;
+}
+
+export interface IStaffRequest {
+  id?: number;
+  branchId: number;
+  userId: number;
+  status: StaffRequestStatus;
+  role: AgencyRoleType;
+}
+
+export interface IRating {
+  id?: number;
+  agencyId: number;
+  userId: number;
+  rating: RatingPoint;
 }
 
 export interface PaginationProps {

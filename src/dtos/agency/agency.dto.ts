@@ -4,5 +4,5 @@ export class AgencyDto implements IAgency {
   id?: number;
   name: string;
   description?: string;
-  categories?: number[];
+  categoryId: number;
 }

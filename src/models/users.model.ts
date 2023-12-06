@@ -1,6 +1,6 @@
 import { Sequelize, DataTypes, Model } from "sequelize";
 import { sequelize } from "../configs/sequelize.config";
-import { IUser, RoleType } from "../constants";
+import { AgencyRoleType, IUser, RoleType } from "../constants";
 
 export class User extends Model implements IUser {
   id: number;
@@ -13,6 +13,7 @@ export class User extends Model implements IUser {
   active: boolean;
   role: RoleType;
   branchId: number | null;
+  agencyRole: AgencyRoleType | null;
 }
 
 User.init(
@@ -53,6 +54,11 @@ User.init(
     branchId: {
       type: DataTypes.INTEGER,
       allowNull: true,
+    },
+    agencyRole: {
+      type: DataTypes.ENUM({ values: Object.values(AgencyRoleType) }),
+      allowNull: true,
+      defaultValue: null,
     },
   },
   {

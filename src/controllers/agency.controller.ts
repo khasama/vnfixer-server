@@ -11,7 +11,11 @@ class AgencyController {
     const page = parseInt(String(req.query.page)) || 1;
     const limit = parseInt(String(req.query.limit)) || 10;
     const sort = String(req.query.page);
-    const result = await this._service.getAllWithPagination({
+    const filter = {};
+    if (req.query.category) {
+      filter["categoryId"] = parseInt(String(req.query.category));
+    }
+    const result = await this._service.getAllWithPagination(filter, {
       page,
       limit,
       sort,

@@ -1,11 +1,12 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../configs/sequelize.config";
-import { IRequest, RequestStatus } from "../constants";
+import { IRequest, RequestStatus, cities } from "../constants";
 
 export class Request extends Model implements IRequest {
   id: number;
   title: string;
   description: string;
+  city: string;
   location: string;
   expectDate: Date;
   status: string;
@@ -27,6 +28,10 @@ Request.init(
     },
     description: {
       type: DataTypes.STRING,
+    },
+    city: {
+      type: DataTypes.ENUM({ values: cities }),
+      allowNull: false,
     },
     location: {
       type: DataTypes.STRING,

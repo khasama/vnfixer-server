@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { cities } from "../constants";
+import { AgencyRoleType, RequestStatus, cities } from "../constants";
 
 export const authSchema = Joi.object({
   email: Joi.string().trim().email().required(),
@@ -14,7 +14,7 @@ export const categorySchema = Joi.object({
 export const agencySchema = Joi.object({
   name: Joi.string().trim().required(),
   description: Joi.string().trim(),
-  categories: Joi.array().items(Joi.number()),
+  categoryId: Joi.number().required(),
 });
 
 export const branchSchema = Joi.object({
@@ -33,4 +33,29 @@ export const requestSchema = Joi.object({
   categoryId: Joi.number().required(),
   branchId: Joi.number().allow(null),
   userId: Joi.number(),
+  city: Joi.string()
+    .trim()
+    .valid(...cities),
+});
+
+export const filterRequestsSchema = Joi.object({
+  limit: Joi.number().optional(),
+  page: Joi.number().optional(),
+  category: Joi.number().optional(),
+  status: Joi.string()
+    .trim()
+    .valid(...Object.values(RequestStatus))
+    .optional(),
+  city: Joi.string()
+    .trim()
+    .valid(...cities)
+    .optional(),
+});
+
+export const addStaffSchema = Joi.object({
+  userId: Joi.number().required(),
+  role: Joi.string()
+    .trim()
+    .valid(...Object.values(AgencyRoleType))
+    .required(),
 });

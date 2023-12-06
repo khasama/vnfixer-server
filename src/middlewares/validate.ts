@@ -1,9 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import {
+  addStaffSchema,
   agencySchema,
   authSchema,
   branchSchema,
   categorySchema,
+  filterRequestsSchema,
   requestSchema,
 } from "../utils/joi.schema";
 import Joi from "joi";
@@ -18,8 +20,20 @@ function validate(schema: Joi.ObjectSchema<any>) {
   };
 }
 
+function validateQuery(schema: Joi.ObjectSchema<any>) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const { error } = schema.validate(req.query);
+    if (error) {
+      next(error);
+    }
+    next();
+  };
+}
+
 export const authValidate = validate(authSchema);
 export const categoryValidate = validate(categorySchema);
 export const agencyValidate = validate(agencySchema);
 export const branchValidate = validate(branchSchema);
 export const requestValidate = validate(requestSchema);
+export const addStaffValidate = validate(addStaffSchema);
+export const filterRequestsValidate = validateQuery(filterRequestsSchema);
