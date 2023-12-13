@@ -4,6 +4,7 @@ import { Branch } from "./branches.model";
 import { Category } from "./categories.model";
 import { Request } from "./requests.model";
 import { StaffRequest } from "./staff-request.model";
+import { Rating } from "./rating.model";
 
 User.belongsTo(Branch, {
   foreignKey: "branchId",
@@ -39,6 +40,7 @@ Branch.hasMany(Request, {
   foreignKey: "branchId",
   onDelete: "RESTRICT",
   onUpdate: "RESTRICT",
+  as: "requests",
 });
 
 Agency.belongsTo(Category, {
@@ -98,4 +100,26 @@ Branch.hasMany(StaffRequest, {
   onUpdate: "RESTRICT",
 });
 
-export { User, Agency, Branch, Category, Request, StaffRequest };
+Rating.belongsTo(User, {
+  foreignKey: "userId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+});
+User.hasMany(Rating, {
+  foreignKey: "userId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+});
+
+Rating.belongsTo(Agency, {
+  foreignKey: "agencyId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+});
+Agency.hasMany(Rating, {
+  foreignKey: "agencyId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+});
+
+export { User, Agency, Branch, Category, Request, StaffRequest, Rating };

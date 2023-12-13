@@ -52,6 +52,16 @@ export const filterRequestsSchema = Joi.object({
     .optional(),
 });
 
+export const filterAgenciesSchema = Joi.object({
+  limit: Joi.number().optional(),
+  page: Joi.number().optional(),
+  categoryId: Joi.number().optional(),
+  city: Joi.string()
+    .trim()
+    .valid(...cities)
+    .optional(),
+});
+
 export const addStaffSchema = Joi.object({
   userId: Joi.number().required(),
   role: Joi.string()

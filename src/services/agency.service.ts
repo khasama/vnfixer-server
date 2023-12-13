@@ -1,15 +1,20 @@
-import { Agency, Branch, Category } from "../models";
+import { Agency, Branch, Category, Request, User } from "../models";
 import { toData } from "../common/mappers";
 import createHttpError from "http-errors";
 import { AgencyDto } from "../dtos/agency/agency.dto";
 import { categoryService } from "./category.service";
-import { PaginationOptions, PaginationProps } from "../constants";
-import { Op } from "sequelize";
+import {
+  PaginationOptions,
+  PaginationProps,
+  RequestStatus,
+} from "../constants";
+import { Op, Sequelize, where } from "sequelize";
 
 interface IAgencyService {
   getAll(): Promise<Agency[]>;
   getAllWithPagination(
     filter,
+    brandFilter,
     option: PaginationOptions
   ): Promise<PaginationProps>;
   findOne(filter): Promise<Agency>;
@@ -41,25 +46,44 @@ class AgencyServive implements IAgencyService {
 
   async getAllWithPagination(
     filter,
+    brandFilter,
     option: PaginationOptions
   ): Promise<PaginationProps> {
     const skip = (option.page - 1) * option.limit;
-    const { count } = await this.agencyModel.findAndCountAll();
-    const agencies = await this.agencyModel.findAll({
+    const brandInclude = {
+      model: Branch,
+      as: "branches",
+      include: [
+        {
+          model: Request,
+          attributes: ["id"],
+          as: "requests",
+          where: {
+            status: RequestStatus.DONE,
+          },
+          required: false,
+        },
+      ],
+    };
+    if (brandFilter["city"]) {
+      brandInclude["where"] = brandFilter;
+    }
+    const queryFilter = {
       where: filter,
-      limit: option.limit,
-      offset: skip,
       include: [
         {
           model: Category,
           as: "category",
           attributes: ["id", "name", "description"],
         },
-        {
-          model: Branch,
-          as: "branches",
-        },
+        brandInclude,
       ],
+    };
+    const count = (await this.agencyModel.findAll(queryFilter)).length;
+    const agencies = await this.agencyModel.findAll({
+      ...queryFilter,
+      limit: option.limit,
+      offset: skip,
     });
     return { entries: agencies, total: count };
   }
@@ -76,6 +100,23 @@ class AgencyServive implements IAgencyService {
         {
           model: Branch,
           as: "branches",
+          include: [
+            {
+              model: Request,
+              attributes: ["id"],
+              as: "requests",
+              where: {
+                status: RequestStatus.DONE,
+              },
+              required: false,
+            },
+            {
+              model: User,
+              attributes: ["id"],
+              as: "users",
+              required: false,
+            },
+          ],
         },
       ],
     });
@@ -83,7 +124,20 @@ class AgencyServive implements IAgencyService {
   }
 
   async getOne(filter): Promise<Agency> {
-    const agency = await this.findOne(filter);
+    const agency = await this.agencyModel.findOne({
+      where: filter,
+      include: [
+        {
+          model: Category,
+          as: "category",
+          attributes: ["id", "name", "description"],
+        },
+        {
+          model: Branch,
+          as: "branches",
+        },
+      ],
+    });
     if (!agency) {
       throw createHttpError.NotFound("Agency not found");
     }

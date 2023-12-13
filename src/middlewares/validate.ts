@@ -5,6 +5,7 @@ import {
   authSchema,
   branchSchema,
   categorySchema,
+  filterAgenciesSchema,
   filterRequestsSchema,
   requestSchema,
 } from "../utils/joi.schema";
@@ -37,3 +38,4 @@ export const branchValidate = validate(branchSchema);
 export const requestValidate = validate(requestSchema);
 export const addStaffValidate = validate(addStaffSchema);
 export const filterRequestsValidate = validateQuery(filterRequestsSchema);
+export const filterAgenciesValidate = validateQuery(filterAgenciesSchema);
