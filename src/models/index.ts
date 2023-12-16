@@ -15,6 +15,7 @@ Branch.hasMany(User, {
   foreignKey: "branchId",
   onDelete: "RESTRICT",
   onUpdate: "RESTRICT",
+  as: "users",
 });
 
 Branch.belongsTo(Agency, {
@@ -120,6 +121,7 @@ Agency.hasMany(Rating, {
   foreignKey: "agencyId",
   onDelete: "RESTRICT",
   onUpdate: "RESTRICT",
+  as: "ratings",
 });
 
 export { User, Agency, Branch, Category, Request, StaffRequest, Rating };

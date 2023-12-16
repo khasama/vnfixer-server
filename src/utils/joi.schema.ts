@@ -1,4 +1,7 @@
-import Joi from "joi";
+import coreJoi from "joi";
+import joiDate from "@joi/date";
+const Joi = coreJoi.extend(joiDate) as typeof coreJoi;
+
 import { AgencyRoleType, RequestStatus, cities } from "../constants";
 
 export const authSchema = Joi.object({
@@ -29,10 +32,13 @@ export const requestSchema = Joi.object({
   title: Joi.string().trim().required(),
   description: Joi.string().trim(),
   location: Joi.string().trim().required(),
-  expectDate: Joi.date(),
+  expectDate: Joi.array().items(Joi.date().format("YYYY-MM-DD").required()),
   categoryId: Joi.number().required(),
   branchId: Joi.number().allow(null),
   userId: Joi.number(),
+  customerPhone: Joi.string().trim().required(),
+  customerName: Joi.string().trim().required(),
+  customerEmail: Joi.string().trim().required(),
   city: Joi.string()
     .trim()
     .valid(...cities),

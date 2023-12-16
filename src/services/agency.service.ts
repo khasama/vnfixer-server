@@ -1,4 +1,4 @@
-import { Agency, Branch, Category, Request, User } from "../models";
+import { Agency, Branch, Category, Rating, Request, User } from "../models";
 import { toData } from "../common/mappers";
 import createHttpError from "http-errors";
 import { AgencyDto } from "../dtos/agency/agency.dto";
@@ -98,15 +98,22 @@ class AgencyServive implements IAgencyService {
           attributes: ["id", "name", "description"],
         },
         {
+          model: Rating,
+          as: "ratings",
+          attributes: ["id", "rating"],
+        },
+        {
           model: Branch,
           as: "branches",
           include: [
             {
               model: Request,
-              attributes: ["id"],
+              attributes: ["id", "status"],
               as: "requests",
               where: {
-                status: RequestStatus.DONE,
+                status: {
+                  [Op.or]: [RequestStatus.DONE, RequestStatus.ACCEPT],
+                },
               },
               required: false,
             },
@@ -124,20 +131,7 @@ class AgencyServive implements IAgencyService {
   }
 
   async getOne(filter): Promise<Agency> {
-    const agency = await this.agencyModel.findOne({
-      where: filter,
-      include: [
-        {
-          model: Category,
-          as: "category",
-          attributes: ["id", "name", "description"],
-        },
-        {
-          model: Branch,
-          as: "branches",
-        },
-      ],
-    });
+    const agency = await this.findOne(filter);
     if (!agency) {
       throw createHttpError.NotFound("Agency not found");
     }

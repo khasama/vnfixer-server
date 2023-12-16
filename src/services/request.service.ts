@@ -16,11 +16,11 @@ interface IRequestService {
     filter,
     option: PaginationOptions
   ): Promise<PaginationProps>;
-  findOne(filter): Promise<Request>;
-  getOne(id: number): Promise<Request>;
-  create(userId: number, requestDto: RequestDto): Promise<Request>;
-  update(id: number, requestDto: RequestDto): Promise<Request>;
-  changeStatus(id: number, status: RequestStatus): Promise<Request>;
+  findOne(filter): Promise<RequestDto>;
+  getOne(id: number): Promise<RequestDto>;
+  create(userId: number, requestDto: RequestDto): Promise<RequestDto>;
+  update(id: number, requestDto: RequestDto): Promise<RequestDto>;
+  changeStatus(id: number, status: RequestStatus): Promise<RequestDto>;
 }
 
 class RequestServive implements IRequestService {
@@ -29,7 +29,7 @@ class RequestServive implements IRequestService {
   private categoryService = categoryService;
 
   async getAll(): Promise<Request[]> {
-    const agencies = await this.requestModel.findAll({
+    const requests = await this.requestModel.findAll({
       include: [
         {
           model: Category,
@@ -42,7 +42,7 @@ class RequestServive implements IRequestService {
         },
       ],
     });
-    return agencies;
+    return requests;
   }
 
   async getAllWithPagination(
@@ -51,7 +51,7 @@ class RequestServive implements IRequestService {
   ): Promise<PaginationProps> {
     const skip = (option.page - 1) * option.limit;
     const { count } = await this.requestModel.findAndCountAll();
-    const agencies = await this.requestModel.findAll({
+    const requests = await this.requestModel.findAll({
       where: filter,
       limit: option.limit,
       offset: skip,
@@ -67,11 +67,17 @@ class RequestServive implements IRequestService {
         },
       ],
     });
-    return { entries: agencies, total: count };
+    const requestsMapped = requests.map((request) => {
+      return {
+        ...request.toJSON(),
+        expectDate: request.expectDate.split(","),
+      } as RequestDto;
+    });
+    return { entries: requestsMapped, total: count };
   }
 
-  async findOne(filter): Promise<Request> {
-    const agency = await this.requestModel.findOne({
+  async findOne(filter): Promise<RequestDto> {
+    const request = await this.requestModel.findOne({
       where: filter,
       include: [
         {
@@ -86,10 +92,13 @@ class RequestServive implements IRequestService {
       ],
       raw: true,
     });
-    return agency;
+    return {
+      ...request,
+      expectDate: request.expectDate.split(","),
+    } as RequestDto;
   }
 
-  async getOne(filter): Promise<Request> {
+  async getOne(filter): Promise<RequestDto> {
     const request = await this.findOne(filter);
     if (!request) {
       throw createHttpError.NotFound("Request not found");
@@ -97,29 +106,40 @@ class RequestServive implements IRequestService {
     return request;
   }
 
-  async create(userId: number, requestDto: RequestDto): Promise<Request> {
+  async create(userId: number, requestDto: RequestDto): Promise<RequestDto> {
     await this.categoryService.getOne(requestDto.categoryId);
     const newRequest = await this.requestModel.create({
       ...toData(requestDto),
+      expectDate: Array.isArray(requestDto.expectDate)
+        ? requestDto.expectDate.join(",")
+        : requestDto.expectDate,
       userId,
     });
     return await this.getOne({ id: newRequest.id });
   }
 
-  async update(id: number, requestDto: RequestDto): Promise<Request> {
+  async update(id: number, requestDto: RequestDto): Promise<RequestDto> {
     await this.categoryService.getOne(requestDto.categoryId);
-    const [count] = await this.requestModel.update(toData(requestDto), {
-      where: {
-        id,
+    const [count] = await this.requestModel.update(
+      {
+        ...toData(requestDto),
+        expectDate: Array.isArray(requestDto.expectDate)
+          ? requestDto.expectDate.join(",")
+          : requestDto.expectDate,
       },
-    });
+      {
+        where: {
+          id,
+        },
+      }
+    );
     if (count === 0) {
       throw createHttpError.NotFound("Not found");
     }
     return await this.getOne({ id });
   }
 
-  async changeStatus(id: number, status: RequestStatus): Promise<Request> {
+  async changeStatus(id: number, status: RequestStatus): Promise<RequestDto> {
     if (!Object.values(RequestStatus).includes(status)) {
       throw createHttpError.BadRequest("Status invalid");
     }
