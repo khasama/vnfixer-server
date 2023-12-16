@@ -8,7 +8,26 @@ class AgencyController {
   private _service = agencyService;
 
   getAll = catchAsync(async (req: Request, res: Response) => {
-    const result = await this._service.getAll();
+    const page = parseInt(String(req.query.page)) || 1;
+    const limit = parseInt(String(req.query.limit)) || 10;
+    const sort = String(req.query.page);
+    const filter = {};
+    const brandFilter = {};
+    if (req.query.categoryId) {
+      filter["categoryId"] = parseInt(String(req.query.categoryId));
+    }
+    if (req.query.city) {
+      brandFilter["city"] = String(req.query.city);
+    }
+    const result = await this._service.getAllWithPagination(
+      filter,
+      brandFilter,
+      {
+        page,
+        limit,
+        sort,
+      }
+    );
     const respone = new BaseRespone("success", HttpError.SUCCESS, result);
     return res.status(HttpError.SUCCESS).json(respone);
   });

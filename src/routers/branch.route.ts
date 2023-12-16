@@ -1,5 +1,7 @@
+import { AgencyRoleType } from "../constants";
 import { branchController } from "../controllers/branch.controller";
-import { branchValidate } from "../middlewares/validate";
+import { addStaffValidate, branchValidate } from "../middlewares/validate";
+import { verifyAgencyRole, verifyUser } from "../middlewares/verify";
 import { BaseRouter } from "./base.router";
 
 class BranchRouter extends BaseRouter {
@@ -13,6 +15,12 @@ class BranchRouter extends BaseRouter {
     this.router.get("/:id", this._controller.getOne);
     this.router.post("/", branchValidate, this._controller.create);
     this.router.put("/:id", branchValidate, this._controller.update);
+    this.router.post(
+      "/add-staff",
+      verifyAgencyRole(AgencyRoleType.MANAGER),
+      addStaffValidate,
+      this._controller.addStaff
+    );
   }
 }
 

@@ -1,16 +1,20 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../configs/sequelize.config";
-import { IRequest, RequestStatus } from "../constants";
+import { IRequest, RequestStatus, cities } from "../constants";
 
 export class Request extends Model implements IRequest {
   id: number;
   title: string;
   description: string;
+  city: string;
   location: string;
-  expectDate: Date;
+  expectDate: string;
   status: string;
   categoryId: number;
   branchId: number | null;
+  customerPhone: string;
+  customerName: string;
+  customerEmail: string;
   userId: number;
 }
 
@@ -28,17 +32,33 @@ Request.init(
     description: {
       type: DataTypes.STRING,
     },
+    city: {
+      type: DataTypes.ENUM({ values: cities }),
+      allowNull: false,
+    },
     location: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     expectDate: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     status: {
       type: DataTypes.ENUM({ values: Object.values(RequestStatus) }),
       defaultValue: RequestStatus.PENDING,
+    },
+    customerPhone: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    customerName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    customerEmail: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     userId: {
       type: DataTypes.INTEGER,

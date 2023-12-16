@@ -1,4 +1,4 @@
-import { IUser, RoleType } from "../../constants";
+import { AgencyRoleType, IUser, RoleType } from "../../constants";
 import { Exclude } from "class-transformer";
 
 export class UserDto implements IUser {
@@ -22,4 +22,6 @@ export class UserDto implements IUser {
   active: boolean;
 
   branchId: number;
+
+  agencyRole: AgencyRoleType | null;
 }

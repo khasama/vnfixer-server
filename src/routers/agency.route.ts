@@ -1,5 +1,8 @@
 import { agencyController } from "../controllers/agency.controller";
-import { agencyValidate } from "../middlewares/validate";
+import {
+  agencyValidate,
+  filterAgenciesValidate,
+} from "../middlewares/validate";
 import { BaseRouter } from "./base.router";
 
 class AgencyRouter extends BaseRouter {
@@ -10,7 +13,7 @@ class AgencyRouter extends BaseRouter {
     this.init();
   }
   protected init() {
-    this.router.get("/", this._controller.getAll);
+    this.router.get("/", filterAgenciesValidate, this._controller.getAll);
     this.router.get("/:id", this._controller.getOne);
     this.router.post("/", agencyValidate, this._controller.create);
     this.router.put("/:id", agencyValidate, this._controller.update);
