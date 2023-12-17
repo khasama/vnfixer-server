@@ -1,4 +1,4 @@
-import { Agency, Category } from "../models";
+import { Agency, Category, Request } from "../models";
 import { toData } from "../common/mappers";
 import { CategoryDto } from "../dtos/category/category.dto";
 import createHttpError from "http-errors";
@@ -20,11 +20,17 @@ class CategoryServive implements ICategoryService {
 
   async getAll(): Promise<Category[]> {
     const categories = await this.categoryModel.findAll({
+      attributes: ["id", "name", "description"],
       include: [
         {
           model: Agency,
           as: "agencies",
           attributes: ["id", "name", "description"],
+        },
+        {
+          model: Request,
+          as: "requests",
+          attributes: ["id", "status"],
         },
       ],
     });

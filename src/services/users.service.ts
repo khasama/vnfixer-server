@@ -1,6 +1,6 @@
 import createHttpError from "http-errors";
 import { StaffRequest, User } from "../models";
-import { StaffRequestStatus } from "../constants";
+import { AgencyRoleType, StaffRequestStatus } from "../constants";
 import { Op } from "sequelize";
 
 interface IUserService {
@@ -31,6 +31,22 @@ class UserServive implements IUserService {
     return user;
   }
 
+  async updateAgencyStaff(
+    branchId: number,
+    role: AgencyRoleType,
+    userId: number
+  ) {
+    await this.userModel.update(
+      {
+        branchId,
+        agencyRole: role,
+      },
+      {
+        where: { id: userId },
+      }
+    );
+  }
+
   async staffRequest(
     userId: number,
     requestId: number,
@@ -50,15 +66,7 @@ class UserServive implements IUserService {
       throw createHttpError.BadRequest("Request expired");
     }
     if (action === StaffRequestStatus.ACCEPT) {
-      await this.userModel.update(
-        {
-          branchId: request.branchId,
-          agencyRole: request.role,
-        },
-        {
-          where: { id: userId },
-        }
-      );
+      await this.updateAgencyStaff(request.branchId, request.role, userId);
     }
     await this.staffRequestModel.update(
       { status: action },

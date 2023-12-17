@@ -2,9 +2,9 @@ import { Branch, StaffRequest } from "../models";
 import { toData } from "../common/mappers";
 import { BranchDto } from "../dtos/branch/branch.dto";
 import createHttpError from "http-errors";
-import { agencyService } from "./agency.service";
 import { userService } from "./users.service";
 import { AgencyRoleType, StaffRequestStatus } from "../constants";
+import { agencyService } from "./agency.service";
 
 interface IBranchService {
   getOne(filter): Promise<Branch>;
@@ -35,13 +35,13 @@ class BranchServive implements IBranchService {
   }
 
   async create(branchDto: BranchDto): Promise<Branch> {
-    await this.agencyService.getOne(branchDto.agencyId);
+    await this.agencyService.getOne({ id: branchDto.agencyId });
     const newBranch = await this.branchModel.create(toData(branchDto));
-    return await this.getOne({ id: newBranch.id });
+    return this.getOne({ id: newBranch.id });
   }
 
   async update(id: number, branchDto: BranchDto): Promise<Branch> {
-    await this.agencyService.getOne(branchDto.agencyId);
+    await this.agencyService.getOne({ id: branchDto.agencyId });
     const [count] = await this.branchModel.update(toData(branchDto), {
       where: {
         id,

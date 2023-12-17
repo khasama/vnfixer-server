@@ -10,6 +10,7 @@ import { categoryRouter } from "./category.route";
 import { agencyRouter } from "./agency.route";
 import { branchRouter } from "./branch.route";
 import { requestRouter } from "./request.route";
+import { seedRouter } from "./seed.route";
 
 class MasterRouter extends BaseRouter {
   constructor() {
@@ -47,6 +48,7 @@ class MasterRouter extends BaseRouter {
     this.router.use("/agencies", agencyRouter);
     this.router.use("/branches", branchRouter);
     this.router.use("/requests", requestRouter);
+    this.router.use("/seed", seedRouter);
 
     this.router.use(errorController.error);
   }

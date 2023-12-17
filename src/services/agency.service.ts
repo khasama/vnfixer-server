@@ -4,11 +4,16 @@ import createHttpError from "http-errors";
 import { AgencyDto } from "../dtos/agency/agency.dto";
 import { categoryService } from "./category.service";
 import {
+  AgencyRoleType,
   PaginationOptions,
   PaginationProps,
   RequestStatus,
 } from "../constants";
 import { Op, Sequelize, where } from "sequelize";
+import { UserDto } from "../dtos/user/user.dto";
+import { userService } from "./users.service";
+import { BranchDto } from "../dtos/branch/branch.dto";
+import { branchService } from "./branch.service";
 
 interface IAgencyService {
   getAll(): Promise<Agency[]>;
@@ -19,13 +24,15 @@ interface IAgencyService {
   ): Promise<PaginationProps>;
   findOne(filter): Promise<Agency>;
   getOne(filter): Promise<Agency>;
-  create(agencyDto: AgencyDto): Promise<Agency>;
+  create(agencyDto: AgencyDto, user: UserDto, branch: BranchDto);
   update(id: number, agencyDto: AgencyDto): Promise<Agency>;
 }
 
 class AgencyServive implements IAgencyService {
   private agencyModel = Agency;
+  private branchModel = Branch;
   private categoryService = categoryService;
+  private userService = userService;
 
   async getAll(): Promise<Agency[]> {
     const agencies = await this.agencyModel.findAll({
@@ -138,14 +145,29 @@ class AgencyServive implements IAgencyService {
     return agency;
   }
 
-  async create(agencyDto: AgencyDto): Promise<Agency> {
+  async create(agencyDto: AgencyDto, user: UserDto, branch: BranchDto) {
+    if (user.branchId && user.agencyRole) {
+      throw new createHttpError.BadRequest(
+        "Current user already in branch !!!"
+      );
+    }
     const agency = await this.findOne({ name: agencyDto.name });
     if (agency) {
       throw new createHttpError.BadRequest("Agency name exist !!!");
     }
-    await this.categoryService.getOne(agencyDto.categoryId);
 
     const newAgency = await this.agencyModel.create(toData(agencyDto));
+    if (branch) {
+      const newBranch = await this.branchModel.create({
+        agencyId: newAgency.id,
+        ...branch,
+      });
+      await this.userService.updateAgencyStaff(
+        newBranch.id,
+        AgencyRoleType.MANAGER,
+        user.id
+      );
+    }
     return await this.getOne({ id: newAgency.id });
   }
 

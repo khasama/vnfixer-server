@@ -41,7 +41,10 @@ class AgencyController {
 
   create = catchAsync(async (req: Request, res: Response) => {
     const agency = req.body;
-    const result = await this._service.create(agency);
+    const branch = agency.branch;
+    delete agency.branch;
+    const user = req["user"];
+    const result = await this._service.create(agency, user, branch);
     const respone = new BaseRespone("success", HttpError.CREATED, result);
     return res.status(HttpError.CREATED).json(respone);
   });

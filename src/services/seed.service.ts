@@ -1,0 +1,84 @@
+import { cities } from "../constants";
+import { Agency, Branch, Category, User } from "../models";
+import bcrypt from "bcrypt";
+
+class SeedServive {
+  private userModel = User;
+  private categoryModel = Category;
+  private agencyModel = Agency;
+  private branchModel = Branch;
+
+  async seed() {
+    await this.userModel.bulkCreate([
+      {
+        email: "khavl741953@gmail.com",
+        password: await bcrypt.hash("0905082320", 10),
+      },
+      {
+        email: "huynhtinnhan2020@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+    ]);
+
+    const categories = await this.categoryModel.bulkCreate([
+      {
+        name: "Sửa chữa xe máy",
+        description: "",
+      },
+      {
+        name: "Sửa chữa thiết bị văn phòng",
+        description: "(Máy in, máy fax, máy photo, scan, ...)",
+      },
+      {
+        name: "Sửa chữa đồ gia dụng",
+        description: "(Quạt, nồi cơm, biếp gas, lò vi sóng, ...)",
+      },
+      {
+        name: "Sửa chữa điện lạnh",
+        description: "(Tủ lạnh, điều hoà, máy giặt, ...)",
+      },
+      {
+        name: "Sửa chữa nội thất",
+        description: "(Bàn, ghế, tủ, kệ, ...)",
+      },
+      {
+        name: "Sửa chữa điện nước",
+        description: "(đường ống nước, đường dây điện)",
+      },
+      {
+        name: "Sửa chữa hệ thống an ninh",
+        description: "(Camera, thiết bị chống trộm, máy quét vân tay, ...)",
+      },
+    ]);
+
+    for (const number of [1, 2, 3, 4, 5]) {
+      const agency = await this.agencyModel.create({
+        name: `Agency ${number}`,
+        description: `This is description of agency ${number}`,
+        categoryId:
+          categories[Math.floor(Math.random() * categories.length)].id,
+      });
+      await this.branchModel.bulkCreate([
+        {
+          city: cities[Math.floor(Math.random() * cities.length)],
+          address: `address 1 of ${agency.name}`,
+          agencyId: agency.id,
+        },
+        {
+          city: cities[Math.floor(Math.random() * cities.length)],
+          address: `address 2 of ${agency.name}`,
+          agencyId: agency.id,
+        },
+        {
+          city: cities[Math.floor(Math.random() * cities.length)],
+          address: `address 3 of ${agency.name}`,
+          agencyId: agency.id,
+        },
+      ]);
+    }
+
+    return { message: "seeder run success" };
+  }
+}
+
+export const seedService = new SeedServive();

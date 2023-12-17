@@ -14,18 +14,25 @@ export const categorySchema = Joi.object({
   description: Joi.string().trim(),
 });
 
-export const agencySchema = Joi.object({
-  name: Joi.string().trim().required(),
-  description: Joi.string().trim(),
-  categoryId: Joi.number().required(),
-});
-
 export const branchSchema = Joi.object({
   city: Joi.string()
     .trim()
     .valid(...cities),
   address: Joi.string().trim(),
   agencyId: Joi.number().required(),
+});
+
+export const agencySchema = Joi.object({
+  name: Joi.string().trim().required(),
+  description: Joi.string().trim(),
+  categoryId: Joi.number().required(),
+  branch: Joi.object({
+    city: Joi.string()
+      .trim()
+      .valid(...cities),
+    address: Joi.string().trim(),
+    agencyId: Joi.number(),
+  }),
 });
 
 export const requestSchema = Joi.object({

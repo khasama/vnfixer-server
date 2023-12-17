@@ -180,6 +180,13 @@ export interface IRating {
   rating: RatingPoint;
 }
 
+export interface IComment {
+  id?: number;
+  agencyId: number;
+  userId: number;
+  comment: string;
+}
+
 export interface PaginationProps {
   total: number;
   entries: object[];
