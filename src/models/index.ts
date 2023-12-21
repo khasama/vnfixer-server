@@ -11,6 +11,7 @@ User.belongsTo(Branch, {
   foreignKey: "branchId",
   onDelete: "RESTRICT",
   onUpdate: "RESTRICT",
+  as: "branch",
 });
 Branch.hasMany(User, {
   foreignKey: "branchId",
@@ -23,7 +24,7 @@ Branch.belongsTo(Agency, {
   foreignKey: "agencyId",
   onDelete: "RESTRICT",
   onUpdate: "RESTRICT",
-  as: "branches",
+  as: "agency",
 });
 Agency.hasMany(Branch, {
   foreignKey: "agencyId",
@@ -96,6 +97,7 @@ StaffRequest.belongsTo(Branch, {
   foreignKey: "branchId",
   onDelete: "RESTRICT",
   onUpdate: "RESTRICT",
+  as: "branch",
 });
 Branch.hasMany(StaffRequest, {
   foreignKey: "branchId",

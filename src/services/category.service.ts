@@ -37,6 +37,25 @@ class CategoryServive implements ICategoryService {
     return categories;
   }
 
+  async getTop(): Promise<Category[]> {
+    const categories = await this.categoryModel.findAll({
+      attributes: ["id", "name", "description"],
+      include: [
+        {
+          model: Agency,
+          as: "agencies",
+          attributes: ["id", "name", "description"],
+        },
+        {
+          model: Request,
+          as: "requests",
+          attributes: ["id", "status"],
+        },
+      ],
+    });
+    return categories;
+  }
+
   async getAllWithPagination(
     option: PaginationOptions
   ): Promise<PaginationProps> {

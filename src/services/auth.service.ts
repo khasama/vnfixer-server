@@ -6,7 +6,7 @@ import { genAccessToken } from "../utils/jwt";
 import { plainToClass } from "class-transformer";
 import { UserDto } from "../dtos/user/user.dto";
 import createError from "http-errors";
-import { User } from "../models";
+import { Agency, Branch, User } from "../models";
 import { AuthDto } from "../dtos/auth/auth.dto";
 
 interface IAuthService {
@@ -28,8 +28,25 @@ class AuthServive implements IAuthService {
       throw createError.BadRequest("Wrong password");
     }
     const accessToken = await genAccessToken(plainToClass(UserDto, user));
+    const u = await this.userModel.findOne({
+      where: {
+        id: user.id,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+      ],
+    });
 
-    return { accessToken, user: plainToClass(UserDto, user) } as AuthDto;
+    return { accessToken, user: u } as AuthDto;
   }
 
   async register({

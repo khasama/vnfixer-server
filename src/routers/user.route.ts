@@ -16,6 +16,11 @@ class UserRouter extends BaseRouter {
       verifyUser(),
       this._controller.staffRequest
     );
+    this.router.get(
+      "/staff-request",
+      verifyUser(),
+      this._controller.allStaffRequest
+    );
   }
 }
 

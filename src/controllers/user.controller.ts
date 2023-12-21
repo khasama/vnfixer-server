@@ -21,6 +21,13 @@ class UserController {
     const respone = new BaseRespone("success", HttpError.SUCCESS);
     return res.status(HttpError.SUCCESS).json(respone);
   });
+
+  allStaffRequest = catchAsync(async (req: Request, res: Response) => {
+    const user: User = req["user"];
+    const result = await this._service.allStaffRequest(user.id);
+    const respone = new BaseRespone("success", HttpError.SUCCESS, result);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
 }
 
 export const userController = new UserController();

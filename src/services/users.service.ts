@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import { StaffRequest, User } from "../models";
+import { Agency, Branch, StaffRequest, User } from "../models";
 import { AgencyRoleType, StaffRequestStatus } from "../constants";
 import { Op } from "sequelize";
 
@@ -29,6 +29,27 @@ class UserServive implements IUserService {
       throw createHttpError.NotFound("User not found");
     }
     return user;
+  }
+
+  async allStaffRequest(id: number): Promise<StaffRequest[]> {
+    const requests = await this.staffRequestModel.findAll({
+      where: {
+        userId: id,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+      ],
+    });
+    return requests;
   }
 
   async updateAgencyStaff(
