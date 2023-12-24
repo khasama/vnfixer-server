@@ -4,7 +4,7 @@ import {
   RequestStatus,
 } from "../constants";
 import { RequestDto } from "../dtos/request/request.dto";
-import { Branch, Category, Request } from "../models";
+import { Agency, Branch, Category, Request } from "../models";
 import { toData } from "../common/mappers";
 import createHttpError from "http-errors";
 import { branchService } from "./branch.service";
@@ -173,6 +173,31 @@ class RequestServive implements IRequestService {
       branchId,
     };
     await this.update(requestId, dataUpdate);
+  }
+
+  async myRequest(id: number): Promise<RequestDto[]> {
+    const requests = await this.requestModel.findAll({
+      where: {
+        userId: id,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+        {
+          model: Category,
+          as: "category",
+        },
+      ],
+    });
+    return requests;
   }
 }
 

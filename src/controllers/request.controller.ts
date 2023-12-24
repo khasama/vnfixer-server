@@ -68,6 +68,13 @@ class RequestController {
     const respone = new BaseRespone("success", HttpError.SUCCESS);
     return res.status(HttpError.SUCCESS).json(respone);
   });
+
+  myRequests = catchAsync(async (req: Request, res: Response) => {
+    const user: User = req["user"];
+    const result = await this._service.myRequest(user.id);
+    const respone = new BaseRespone("success", HttpError.SUCCESS, result);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
 }
 
 export const requestController = new RequestController();

@@ -68,6 +68,7 @@ class AuthServive implements IAuthService {
   }
 
   async logout() {
+    return true;
     throw new Error("Method not implemented.");
   }
 }

@@ -156,7 +156,10 @@ class AgencyServive implements IAgencyService {
       throw new createHttpError.BadRequest("Agency name exist !!!");
     }
 
-    const newAgency = await this.agencyModel.create(toData(agencyDto));
+    const newAgency = await this.agencyModel.create({
+      ...toData(agencyDto),
+      ownerId: user.id,
+    });
     if (branch) {
       const newBranch = await this.branchModel.create({
         agencyId: newAgency.id,

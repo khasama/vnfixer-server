@@ -33,6 +33,19 @@ Agency.hasMany(Branch, {
   as: "branches",
 });
 
+Agency.belongsTo(User, {
+  foreignKey: "ownerId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "owner",
+});
+User.hasOne(Agency, {
+  foreignKey: "ownerId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "agency",
+});
+
 Request.belongsTo(Branch, {
   foreignKey: "branchId",
   onDelete: "RESTRICT",

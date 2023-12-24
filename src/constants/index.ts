@@ -134,6 +134,7 @@ export interface IAgency {
   name: string;
   description?: string;
   categoryId: number;
+  ownerId: number;
   logo: string;
 }
 

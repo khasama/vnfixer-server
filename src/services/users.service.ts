@@ -2,6 +2,8 @@ import createHttpError from "http-errors";
 import { Agency, Branch, StaffRequest, User } from "../models";
 import { AgencyRoleType, StaffRequestStatus } from "../constants";
 import { Op } from "sequelize";
+import { UserDto } from "../dtos/user/user.dto";
+import { toData } from "../common/mappers";
 
 interface IUserService {
   getAll(): Promise<User[]>;
@@ -95,6 +97,32 @@ class UserServive implements IUserService {
         where: { id: requestId },
       }
     );
+  }
+
+  async updateInfo(userId: number, userDto: UserDto) {
+    await this.userModel.update(toData(userDto), {
+      where: {
+        id: userId,
+      },
+    });
+    const userUpdated = await this.userModel.findOne({
+      where: {
+        id: userId,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+      ],
+    });
+    return userUpdated;
   }
 }
 
