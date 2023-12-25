@@ -9,6 +9,7 @@ import { toData } from "../common/mappers";
 import createHttpError from "http-errors";
 import { branchService } from "./branch.service";
 import { categoryService } from "./category.service";
+import { UserDto } from "../dtos/user/user.dto";
 
 interface IRequestService {
   getAll(): Promise<Request[]>;
@@ -164,7 +165,7 @@ class RequestServive implements IRequestService {
       throw createHttpError.BadRequest("Missing param(s)");
     }
     const request = await this.getOne({ id: requestId });
-    if (request.status !== RequestStatus.PENDING) {
+    if (request.status !== RequestStatus.PICKED) {
       throw createHttpError.BadRequest("Request not available");
     }
     const dataUpdate = {
@@ -179,6 +180,35 @@ class RequestServive implements IRequestService {
     const requests = await this.requestModel.findAll({
       where: {
         userId: id,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+        {
+          model: Category,
+          as: "category",
+        },
+      ],
+    });
+    return requests;
+  }
+
+  async requestToTake(user: UserDto): Promise<RequestDto[]> {
+    if (!user.branchId || !user.agencyRole) {
+      throw createHttpError.Forbidden("You are not staff");
+    }
+    const requests = await this.requestModel.findAll({
+      where: {
+        branchId: user.branchId,
+        status: RequestStatus.PICKED,
       },
       include: [
         {

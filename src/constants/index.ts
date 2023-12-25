@@ -19,6 +19,7 @@ export enum AgencyRoleType {
 
 export enum RequestStatus {
   PENDING = "PENDING",
+  PICKED = "PICKED",
   ACCEPT = "ACCEPT",
   DONE = "DONE",
   CANCEL = "CANCEL",
