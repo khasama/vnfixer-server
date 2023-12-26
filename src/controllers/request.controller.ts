@@ -64,7 +64,7 @@ class RequestController {
   takeRequest = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const user: User = req["user"];
-    await this._service.takeRequest(user.branchId, parseInt(id));
+    await this._service.takeRequest(user, parseInt(id));
     const respone = new BaseRespone("success", HttpError.SUCCESS);
     return res.status(HttpError.SUCCESS).json(respone);
   });
@@ -79,6 +79,13 @@ class RequestController {
   requestToTake = catchAsync(async (req: Request, res: Response) => {
     const user: User = req["user"];
     const result = await this._service.requestToTake(user);
+    const respone = new BaseRespone("success", HttpError.SUCCESS, result);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
+
+  requestTaked = catchAsync(async (req: Request, res: Response) => {
+    const user: User = req["user"];
+    const result = await this._service.requestTaked(user);
     const respone = new BaseRespone("success", HttpError.SUCCESS, result);
     return res.status(HttpError.SUCCESS).json(respone);
   });

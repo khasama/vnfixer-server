@@ -14,4 +14,5 @@ export class RequestDto implements IRequest {
   customerName: string;
   customerEmail: string;
   userId: number;
+  staffId: number;
 }

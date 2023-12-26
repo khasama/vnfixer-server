@@ -21,6 +21,11 @@ class RequestRouter extends BaseRouter {
       verifyUser(),
       this._controller.requestToTake
     );
+    this.router.get(
+      "/request-taked",
+      verifyUser(),
+      this._controller.requestTaked
+    );
     this.router.get("/:id", this._controller.getOne);
     this.router.patch("/change-status/:id", this._controller.changeStatus);
     this.router.post(
@@ -29,13 +34,13 @@ class RequestRouter extends BaseRouter {
       requestValidate,
       this._controller.create
     );
+    this.router.put("/take/:id", verifyUser(), this._controller.takeRequest);
     this.router.put(
       "/:id",
       verifyUser(),
       requestValidate,
       this._controller.update
     );
-    this.router.put("/take/:id", verifyUser(), this._controller.takeRequest);
   }
 }
 

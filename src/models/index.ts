@@ -96,6 +96,19 @@ User.hasMany(Request, {
   onUpdate: "RESTRICT",
 });
 
+Request.belongsTo(User, {
+  foreignKey: "staffId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "staff",
+});
+User.hasMany(Request, {
+  foreignKey: "staffId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "requestsTaked",
+});
+
 StaffRequest.belongsTo(User, {
   foreignKey: "userId",
   onDelete: "RESTRICT",

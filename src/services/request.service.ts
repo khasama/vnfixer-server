@@ -160,20 +160,33 @@ class RequestServive implements IRequestService {
     return await this.getOne({ id });
   }
 
-  async takeRequest(branchId: number, requestId: number) {
-    if (!branchId || !requestId) {
+  async takeRequest(user: UserDto, requestId: number) {
+    if (!user.branchId || !requestId) {
       throw createHttpError.BadRequest("Missing param(s)");
     }
-    const request = await this.getOne({ id: requestId });
-    if (request.status !== RequestStatus.PICKED) {
+    const requestTaked = await this.requestModel.findOne({
+      where: {
+        staffId: user.id,
+        status: RequestStatus.ACCEPT,
+      },
+    });
+    if (requestTaked) {
+      throw createHttpError.BadRequest("Please done the request is processing");
+    }
+    const request = await this.requestModel.findOne({
+      where: { id: requestId },
+    });
+    if (request.status !== RequestStatus.PICKED || request.staffId) {
       throw createHttpError.BadRequest("Request not available");
     }
     const dataUpdate = {
       ...request,
       status: RequestStatus.ACCEPT,
-      branchId,
+      branchId: user.branchId,
+      staffId: user.id,
     };
     await this.update(requestId, dataUpdate);
+    return this.requestToTake(user);
   }
 
   async myRequest(id: number): Promise<RequestDto[]> {
@@ -228,6 +241,36 @@ class RequestServive implements IRequestService {
       ],
     });
     return requests;
+  }
+
+  async requestTaked(user: UserDto): Promise<RequestDto> {
+    if (!user.branchId || !user.agencyRole) {
+      throw createHttpError.Forbidden("You are not staff");
+    }
+    const request = await this.requestModel.findOne({
+      where: {
+        branchId: user.branchId,
+        status: RequestStatus.ACCEPT,
+        staffId: user.id,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+        {
+          model: Category,
+          as: "category",
+        },
+      ],
+    });
+    return request;
   }
 }
 

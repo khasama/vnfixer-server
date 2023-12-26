@@ -165,6 +165,7 @@ export interface IRequest {
   customerName: string;
   customerEmail: string;
   userId: number;
+  staffId: number | null;
 }
 
 export interface IStaffRequest {
