@@ -38,7 +38,7 @@ export const agencySchema = Joi.object({
 export const updateInfoSchema = Joi.object({
   phone: Joi.string().trim().required(),
   fullName: Joi.string().trim().required(),
-  address: Joi.string().trim().required(),
+  // address: Joi.string().trim().required(),
 });
 
 export const requestSchema = Joi.object({

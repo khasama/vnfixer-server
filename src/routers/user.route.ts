@@ -13,7 +13,8 @@ class UserRouter extends BaseRouter {
   protected init() {
     this.router.get("/", this._controller.getAll);
     this.router.put(
-      "/infomation",
+      "/information",
+      verifyUser(),
       updateInfoValidate,
       this._controller.updateInfo
     );

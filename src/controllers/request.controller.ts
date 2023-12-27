@@ -55,8 +55,9 @@ class RequestController {
 
   changeStatus = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
+    const user: User = req["user"];
     const status = req.query.status as RequestStatus;
-    const result = await this._service.changeStatus(parseInt(id), status);
+    const result = await this._service.changeStatus(user, parseInt(id), status);
     const respone = new BaseRespone("success", HttpError.SUCCESS, result);
     return res.status(HttpError.SUCCESS).json(respone);
   });
@@ -65,6 +66,14 @@ class RequestController {
     const { id } = req.params;
     const user: User = req["user"];
     await this._service.takeRequest(user, parseInt(id));
+    const respone = new BaseRespone("success", HttpError.SUCCESS);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
+
+  pickRequest = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const user: User = req["user"];
+    await this._service.pickRequest(user, parseInt(id));
     const respone = new BaseRespone("success", HttpError.SUCCESS);
     return res.status(HttpError.SUCCESS).json(respone);
   });

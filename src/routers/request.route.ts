@@ -1,9 +1,10 @@
+import { AgencyRoleType } from "../constants";
 import { requestController } from "../controllers/request.controller";
 import {
   filterRequestsValidate,
   requestValidate,
 } from "../middlewares/validate";
-import { verifyUser } from "../middlewares/verify";
+import { verifyAgencyRole, verifyUser } from "../middlewares/verify";
 import { BaseRouter } from "./base.router";
 
 class RequestRouter extends BaseRouter {
@@ -27,7 +28,11 @@ class RequestRouter extends BaseRouter {
       this._controller.requestTaked
     );
     this.router.get("/:id", this._controller.getOne);
-    this.router.patch("/change-status/:id", this._controller.changeStatus);
+    this.router.patch(
+      "/change-status/:id",
+      verifyUser(),
+      this._controller.changeStatus
+    );
     this.router.post(
       "/",
       verifyUser(),
@@ -35,6 +40,11 @@ class RequestRouter extends BaseRouter {
       this._controller.create
     );
     this.router.put("/take/:id", verifyUser(), this._controller.takeRequest);
+    this.router.put(
+      "/pick/:id",
+      verifyAgencyRole(AgencyRoleType.MANAGER),
+      this._controller.pickRequest
+    );
     this.router.put(
       "/:id",
       verifyUser(),

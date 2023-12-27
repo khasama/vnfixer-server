@@ -1,4 +1,5 @@
 import {
+  AgencyRoleType,
   PaginationOptions,
   PaginationProps,
   RequestStatus,
@@ -21,7 +22,7 @@ interface IRequestService {
   getOne(id: number): Promise<RequestDto>;
   create(userId: number, requestDto: RequestDto): Promise<RequestDto>;
   update(id: number, requestDto: RequestDto): Promise<RequestDto>;
-  changeStatus(id: number, status: RequestStatus): Promise<RequestDto>;
+  changeStatus(user: UserDto, requestId: number, status: RequestStatus);
 }
 
 class RequestServive implements IRequestService {
@@ -140,9 +141,28 @@ class RequestServive implements IRequestService {
     return await this.getOne({ id });
   }
 
-  async changeStatus(id: number, status: RequestStatus): Promise<RequestDto> {
+  async changeStatus(user: UserDto, requestId: number, status: RequestStatus) {
     if (!Object.values(RequestStatus).includes(status)) {
       throw createHttpError.BadRequest("Status invalid");
+    }
+    const request = await this.getOne({ id: requestId });
+    if (!user.branchId) {
+      throw createHttpError.Forbidden("You are not staff");
+    }
+    if (
+      user.agencyRole === AgencyRoleType.STAFF &&
+      request.staffId !== user.id
+    ) {
+      throw createHttpError.Forbidden("This request not assign for you");
+    }
+    if (
+      user.agencyRole === AgencyRoleType.MANAGER &&
+      request.branchId &&
+      request.branchId !== user.branchId
+    ) {
+      throw createHttpError.Forbidden(
+        "You can not change status of this request"
+      );
     }
     const [count] = await this.requestModel.update(
       {
@@ -150,14 +170,13 @@ class RequestServive implements IRequestService {
       },
       {
         where: {
-          id,
+          id: requestId,
         },
       }
     );
     if (count === 0) {
       throw createHttpError.NotFound("Not found");
     }
-    return await this.getOne({ id });
   }
 
   async takeRequest(user: UserDto, requestId: number) {
@@ -184,6 +203,25 @@ class RequestServive implements IRequestService {
       status: RequestStatus.ACCEPT,
       branchId: user.branchId,
       staffId: user.id,
+    };
+    await this.update(requestId, dataUpdate);
+    return this.requestToTake(user);
+  }
+
+  async pickRequest(user: UserDto, requestId: number) {
+    if (!user.branchId || !requestId) {
+      throw createHttpError.BadRequest("Missing param(s)");
+    }
+    const request = await this.requestModel.findOne({
+      where: { id: requestId },
+    });
+    if (request.status !== RequestStatus.PENDING || request.branchId) {
+      throw createHttpError.BadRequest("Request not available");
+    }
+    const dataUpdate = {
+      ...request,
+      status: RequestStatus.PICKED,
+      branchId: user.branchId,
     };
     await this.update(requestId, dataUpdate);
     return this.requestToTake(user);
