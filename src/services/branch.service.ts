@@ -1,9 +1,9 @@
-import { Branch, StaffRequest } from "../models";
+import { Branch, StaffRequest, User } from "../models";
 import { toData } from "../common/mappers";
 import { BranchDto } from "../dtos/branch/branch.dto";
 import createHttpError from "http-errors";
 import { userService } from "./users.service";
-import { AgencyRoleType, StaffRequestStatus } from "../constants";
+import { AgencyRoleType, RoleType, StaffRequestStatus } from "../constants";
 import { agencyService } from "./agency.service";
 
 interface IBranchService {
@@ -16,6 +16,7 @@ interface IBranchService {
 class BranchServive implements IBranchService {
   private branchModel = Branch;
   private staffRequestModel = StaffRequest;
+  private userModel = User;
   private agencyService = agencyService;
   private userService = userService;
 
@@ -79,7 +80,38 @@ class BranchServive implements IBranchService {
     });
   }
 
-  async removeStaff(branchId: number, userId: number) {}
+  async getAllStaffs(branchId: number) {
+    if (!branchId) {
+      throw createHttpError.BadRequest("Missing param(s)");
+    }
+    const staffs = await this.userModel.findAll({
+      where: {
+        branchId,
+      },
+    });
+    return staffs;
+  }
+
+  async removeStaff(branchId: number, userId: number) {
+    const user = await this.userModel.findOne({
+      where: { id: userId },
+    });
+    if (user.branchId !== branchId) {
+      throw createHttpError.Forbidden("No permission");
+    }
+    await this.userModel.update(
+      {
+        branchId: null,
+        agencyRole: null,
+        role: RoleType.CUSTOMER,
+      },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
+  }
 }
 
 export const branchService = new BranchServive();

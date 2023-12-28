@@ -36,6 +36,21 @@ class BranchController {
     const respone = new BaseRespone("success", HttpError.SUCCESS);
     return res.status(HttpError.SUCCESS).json(respone);
   });
+
+  removeStaff = catchAsync(async (req: Request, res: Response) => {
+    const { branchId } = req["user"];
+    const { id } = req.params;
+    await this._service.removeStaff(parseInt(branchId), parseInt(id));
+    const respone = new BaseRespone("success", HttpError.SUCCESS);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
+
+  allStaffs = catchAsync(async (req: Request, res: Response) => {
+    const { branchId } = req["user"];
+    const result = await this._service.getAllStaffs(parseInt(branchId));
+    const respone = new BaseRespone("success", HttpError.SUCCESS, result);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
 }
 
 export const branchController = new BranchController();
