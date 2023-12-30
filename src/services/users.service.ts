@@ -146,7 +146,7 @@ class UserServive implements IUserService {
           [Op.like]: `%${email}%`,
         },
       },
-      attributes: ["id email branchId imageUrl"],
+      attributes: ["id", "email", "branchId", "imageUrl"],
       include: [
         {
           model: Branch,
