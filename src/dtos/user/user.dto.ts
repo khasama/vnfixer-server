@@ -24,4 +24,6 @@ export class UserDto implements IUser {
   branchId: number;
 
   agencyRole: AgencyRoleType | null;
+
+  mobileNotiToken: string | null;
 }

@@ -1,5 +1,6 @@
 import {
   AgencyRoleType,
+  INotificationContent,
   PaginationOptions,
   PaginationProps,
   RequestStatus,
@@ -11,6 +12,7 @@ import createHttpError from "http-errors";
 import { branchService } from "./branch.service";
 import { categoryService } from "./category.service";
 import { UserDto } from "../dtos/user/user.dto";
+import { notificationService } from "./notification.service";
 
 interface IRequestService {
   getAll(): Promise<Request[]>;
@@ -29,6 +31,7 @@ class RequestServive implements IRequestService {
   private requestModel = Request;
   private branchService = branchService;
   private categoryService = categoryService;
+  private notificationService = notificationService;
 
   async getAll(): Promise<Request[]> {
     const requests = await this.requestModel.findAll({
@@ -224,6 +227,12 @@ class RequestServive implements IRequestService {
       branchId: user.branchId,
     };
     await this.update(requestId, dataUpdate);
+    const notificationContent: INotificationContent = {
+      title: "Yêu cầu của bạn đã được chọn",
+      body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được nhận`,
+      data: {},
+    };
+    await this.notificationService.send(request.userId, notificationContent);
     return this.requestToTake(user);
   }
 

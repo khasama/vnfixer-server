@@ -4,6 +4,7 @@ import { AgencyRoleType, StaffRequestStatus } from "../constants";
 import { Op } from "sequelize";
 import { UserDto } from "../dtos/user/user.dto";
 import { toData } from "../common/mappers";
+import { encryptData } from "../utils/hashToken";
 
 interface IUserService {
   getAll(): Promise<User[]>;
@@ -123,6 +124,43 @@ class UserServive implements IUserService {
       ],
     });
     return userUpdated;
+  }
+
+  async updateNotiToken(userId: number, token: string) {
+    await this.userModel.update(
+      {
+        mobileNotiToken: encryptData(token),
+      },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
+  }
+
+  async findWithEmail(email: string): Promise<User[]> {
+    const users = await this.userModel.findAll({
+      where: {
+        email: {
+          [Op.like]: `%${email}%`,
+        },
+      },
+      attributes: ["id email branchId imageUrl"],
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+      ],
+    });
+    return users;
   }
 }
 

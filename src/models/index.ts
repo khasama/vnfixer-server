@@ -6,6 +6,7 @@ import { Request } from "./requests.model";
 import { StaffRequest } from "./staff-request.model";
 import { Rating } from "./rating.model";
 import { Comment } from "./comment.model";
+import { Notification } from "./notifications.model";
 
 User.belongsTo(Branch, {
   foreignKey: "branchId",
@@ -166,6 +167,18 @@ Agency.hasMany(Comment, {
   as: "commentss",
 });
 
+Notification.belongsTo(User, {
+  foreignKey: "ownerId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "owner",
+});
+User.hasMany(Notification, {
+  foreignKey: "ownerId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+});
+
 export {
   User,
   Agency,
@@ -175,4 +188,5 @@ export {
   StaffRequest,
   Rating,
   Comment,
+  Notification,
 };

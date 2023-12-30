@@ -1,5 +1,9 @@
 import { userController } from "../controllers/user.controller";
-import { updateInfoValidate } from "../middlewares/validate";
+import {
+  findWithEmailSchemaValidate,
+  updateInfoValidate,
+  updateNotiTokenValidate,
+} from "../middlewares/validate";
 import { verifyUser } from "../middlewares/verify";
 import { BaseRouter } from "./base.router";
 
@@ -12,6 +16,12 @@ class UserRouter extends BaseRouter {
   }
   protected init() {
     this.router.get("/", this._controller.getAll);
+    this.router.get(
+      "/email",
+      verifyUser(),
+      findWithEmailSchemaValidate,
+      this._controller.findWithEmail
+    );
     this.router.put(
       "/information",
       verifyUser(),
@@ -27,6 +37,12 @@ class UserRouter extends BaseRouter {
       "/staff-request",
       verifyUser(),
       this._controller.allStaffRequest
+    );
+    this.router.patch(
+      "/notification-token",
+      verifyUser(),
+      updateNotiTokenValidate,
+      this._controller.updateNotiToken
     );
   }
 }

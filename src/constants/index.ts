@@ -122,6 +122,7 @@ export interface IUser {
   role: RoleType;
   branchId: number | null;
   agencyRole: AgencyRoleType | null;
+  mobileNotiToken: string | null;
 }
 
 export interface ICategory {
@@ -188,6 +189,19 @@ export interface IComment {
   agencyId: number;
   userId: number;
   comment: string;
+}
+
+export interface INotification {
+  id?: number;
+  content: string | INotificationContent;
+  read: boolean;
+  ownerId: number;
+}
+
+export interface INotificationContent {
+  title: string;
+  body: string;
+  data: Record<any, any>;
 }
 
 export interface PaginationProps {

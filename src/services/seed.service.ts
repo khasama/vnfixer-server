@@ -1,4 +1,4 @@
-import { cities } from "../constants";
+import { AgencyRoleType, RoleType, cities } from "../constants";
 import { Agency, Branch, Category, User } from "../models";
 import bcrypt from "bcrypt";
 
@@ -9,13 +9,69 @@ class SeedServive {
   private branchModel = Branch;
 
   async seed() {
-    await this.userModel.bulkCreate([
+    const users = await this.userModel.bulkCreate([
       {
         email: "khavl741953@gmail.com",
         password: await bcrypt.hash("0905082320", 10),
       },
       {
         email: "huynhtinnhan2020@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test1@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test2@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test3@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test4@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test5@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test6@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test7@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test8@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test9@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test10@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test11@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test12@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test13@gmail.com",
+        password: await bcrypt.hash("123456a@", 10),
+      },
+      {
+        email: "test14@gmail.com",
         password: await bcrypt.hash("123456a@", 10),
       },
     ]);
@@ -51,14 +107,15 @@ class SeedServive {
       },
     ]);
 
-    for (const number of [1, 2, 3, 4, 5]) {
+    for (const user of users) {
       const agency = await this.agencyModel.create({
-        name: `Agency ${number}`,
-        description: `This is description of agency ${number}`,
+        name: `Agency ${user}`,
+        description: `This is description of agency ${user.id}`,
+        ownerId: user.id,
         categoryId:
           categories[Math.floor(Math.random() * categories.length)].id,
       });
-      await this.branchModel.bulkCreate([
+      const branches = await this.branchModel.bulkCreate([
         {
           city: cities[Math.floor(Math.random() * cities.length)],
           address: `address 1 of ${agency.name}`,
@@ -75,6 +132,16 @@ class SeedServive {
           agencyId: agency.id,
         },
       ]);
+      await this.userModel.update(
+        {
+          branchId: branches[0].id,
+          agencyRole: AgencyRoleType.MANAGER,
+          role: RoleType.AGENCY,
+        },
+        {
+          where: { id: user.id },
+        }
+      );
     }
 
     return { message: "seeder run success" };

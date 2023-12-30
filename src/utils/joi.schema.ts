@@ -88,3 +88,11 @@ export const addStaffSchema = Joi.object({
     .valid(...Object.values(AgencyRoleType))
     .required(),
 });
+
+export const updateNotiTokenSchema = Joi.object({
+  token: Joi.string().trim().required(),
+});
+
+export const findWithEmailSchema = Joi.object({
+  email: Joi.string().trim().required(),
+});
