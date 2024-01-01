@@ -31,6 +31,7 @@ class NotificationService implements INotificationService {
       where: {
         ownerId: userId,
       },
+      order: [["id", "DESC"]],
       include: [
         {
           model: User,

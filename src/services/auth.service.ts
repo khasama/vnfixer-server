@@ -12,7 +12,7 @@ import { AuthDto } from "../dtos/auth/auth.dto";
 interface IAuthService {
   login(body: LoginDto): Promise<AuthDto>;
   register(body: RegisterDto): Promise<{ message: string }>;
-  logout();
+  logout(userId: number);
 }
 
 class AuthServive implements IAuthService {
@@ -67,9 +67,18 @@ class AuthServive implements IAuthService {
     };
   }
 
-  async logout() {
+  async logout(userId: number) {
+    await this.userModel.update(
+      {
+        mobileNotiToken: null,
+      },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
     return true;
-    throw new Error("Method not implemented.");
   }
 }
 

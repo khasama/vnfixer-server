@@ -180,6 +180,31 @@ class RequestServive implements IRequestService {
     if (count === 0) {
       throw createHttpError.NotFound("Not found");
     }
+    let notificationContent: INotificationContent;
+    if (status === RequestStatus.DONE) {
+      notificationContent = {
+        title: "Yêu cầu của bạn đã được hoàn thành",
+        body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được hoàn thành`,
+        data: {},
+      };
+    } else if (status === RequestStatus.CANCEL) {
+      notificationContent = {
+        title: "Yêu cầu của bạn đã bị hủy bỏ",
+        body: `Yêu cầu sửa chữa: ${request.title} của bạn đã bị hủy bỏ`,
+        data: {},
+      };
+    } else if (
+      status === RequestStatus.PICKED ||
+      status === RequestStatus.PENDING
+    ) {
+      notificationContent = {
+        title: `Yêu cầu của bạn đã được chuyển về trạng thái ${status}`,
+        body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được chuyển về trạng thái ${status}`,
+        data: {},
+      };
+    }
+
+    await this.notificationService.send(request.userId, notificationContent);
   }
 
   async takeRequest(user: UserDto, requestId: number) {
@@ -208,6 +233,12 @@ class RequestServive implements IRequestService {
       staffId: user.id,
     };
     await this.update(requestId, dataUpdate);
+    const notificationContent: INotificationContent = {
+      title: "Yêu cầu của bạn đã được nhận",
+      body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được nhận bời một nhân viên của đại lý`,
+      data: {},
+    };
+    await this.notificationService.send(request.userId, notificationContent);
     return this.requestToTake(user);
   }
 
@@ -229,7 +260,7 @@ class RequestServive implements IRequestService {
     await this.update(requestId, dataUpdate);
     const notificationContent: INotificationContent = {
       title: "Yêu cầu của bạn đã được chọn",
-      body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được nhận`,
+      body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được chọn bởi một đại lý sửa chữa`,
       data: {},
     };
     await this.notificationService.send(request.userId, notificationContent);
