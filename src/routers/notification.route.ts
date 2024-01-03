@@ -11,6 +11,12 @@ class NotificationRouter extends BaseRouter {
   }
   protected init() {
     this.router.get("/", verifyUser(), this._controller.getMyNotifications);
+    this.router.patch(
+      "/make-read/:id",
+      verifyUser(),
+      this._controller.makeRead
+    );
+    this.router.delete("/:id", verifyUser(), this._controller.delete);
   }
 }
 

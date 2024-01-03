@@ -15,7 +15,9 @@ class RequestController {
       limit: parseInt(String(req.query.limit)) || 10,
       sort: String(req.query.page),
     };
-    const filter = {};
+    const filter = {
+      branchId: null,
+    };
     if (req.query.city) {
       filter["city"] = req.query.city;
     }
@@ -24,6 +26,9 @@ class RequestController {
     }
     if (req.query.category) {
       filter["categoryId"] = parseInt(String(req.query.category));
+    }
+    if (req.query.branchId) {
+      filter["branchId"] = parseInt(String(req.query.branchId));
     }
     const result = await this._service.getAllWithPagination(filter, options);
     const respone = new BaseRespone("success", HttpError.SUCCESS, result);

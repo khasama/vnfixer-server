@@ -61,6 +61,7 @@ export const filterRequestsSchema = Joi.object({
   limit: Joi.number().optional(),
   page: Joi.number().optional(),
   category: Joi.number().optional(),
+  branchId: Joi.number().optional(),
   status: Joi.string()
     .trim()
     .valid(...Object.values(RequestStatus))

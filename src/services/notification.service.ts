@@ -1,5 +1,4 @@
 import { INotificationContent } from "../constants";
-import { LoginDto } from "../dtos/auth/login.dto";
 import { Notification, User } from "../models";
 import { sendNotificationMobile } from "../utils/sendNotification";
 
@@ -24,6 +23,31 @@ class NotificationService implements INotificationService {
       content,
       ownerId: userId,
     });
+    return notification;
+  }
+
+  async delete(userId: number, notificationId: number) {
+    const notification = await this.notificationModel.findOne({
+      where: {
+        id: notificationId,
+        ownerId: userId,
+      },
+    });
+    await notification.destroy({ force: true });
+  }
+
+  async makeRead(userId: number, notificationId: number) {
+    await this.notificationModel.update(
+      {
+        read: true,
+      },
+      {
+        where: {
+          id: notificationId,
+          ownerId: userId,
+        },
+      }
+    );
   }
 
   async getMyNotifications(userId: number) {

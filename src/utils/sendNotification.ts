@@ -10,7 +10,6 @@ export async function sendNotificationMobile(
     return;
   }
   const token = decryptData(hashToken);
-  console.log({ token });
   return await axios.post(
     `https://exp.host/--/api/v2/push/send`,
     { ...content, to: token, sound: "default" },

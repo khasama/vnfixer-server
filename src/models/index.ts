@@ -164,7 +164,20 @@ Agency.hasMany(Comment, {
   foreignKey: "agencyId",
   onDelete: "RESTRICT",
   onUpdate: "RESTRICT",
-  as: "commentss",
+  as: "comments",
+});
+
+Comment.belongsTo(User, {
+  foreignKey: "userId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "owner",
+});
+User.hasMany(Comment, {
+  foreignKey: "userId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "comments",
 });
 
 Notification.belongsTo(User, {

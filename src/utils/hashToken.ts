@@ -1,8 +1,8 @@
 import crypto from "crypto";
 
 const ecnryption_method = "aes-256-cbc";
-const secret_iv = "";
-const secret_key = "";
+const secret_iv = process.env.HASH_SECRET_IV || "secret_iv";
+const secret_key = process.env.HASH_SECRET_KEY || "secret_key";
 
 // Generate secret hash with crypto to use for encryption
 const key = crypto

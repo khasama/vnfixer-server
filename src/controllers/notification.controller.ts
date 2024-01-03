@@ -14,6 +14,22 @@ class NotificationController {
     const respone = new BaseRespone("success", HttpError.SUCCESS, result);
     return res.status(200).json(respone);
   });
+
+  delete = catchAsync(async (req: Request, res: Response) => {
+    const user: User = req["user"];
+    const { id } = req.params;
+    await this._service.delete(user.id, parseInt(id));
+    const respone = new BaseRespone("success", HttpError.SUCCESS);
+    return res.status(200).json(respone);
+  });
+
+  makeRead = catchAsync(async (req: Request, res: Response) => {
+    const user: User = req["user"];
+    const { id } = req.params;
+    await this._service.makeRead(user.id, parseInt(id));
+    const respone = new BaseRespone("success", HttpError.SUCCESS);
+    return res.status(200).json(respone);
+  });
 }
 
 export const notificationController = new NotificationController();

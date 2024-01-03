@@ -249,7 +249,10 @@ class RequestServive implements IRequestService {
     const request = await this.requestModel.findOne({
       where: { id: requestId },
     });
-    if (request.status !== RequestStatus.PENDING || request.branchId) {
+    if (
+      request.status !== RequestStatus.PENDING ||
+      (request.branchId && request.branchId !== user.branchId)
+    ) {
       throw createHttpError.BadRequest("Request not available");
     }
     const dataUpdate = {
