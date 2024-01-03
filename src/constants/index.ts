@@ -19,6 +19,7 @@ export enum AgencyRoleType {
 
 export enum RequestStatus {
   PENDING = "PENDING",
+  PICKED = "PICKED",
   ACCEPT = "ACCEPT",
   DONE = "DONE",
   CANCEL = "CANCEL",
@@ -121,6 +122,7 @@ export interface IUser {
   role: RoleType;
   branchId: number | null;
   agencyRole: AgencyRoleType | null;
+  mobileNotiToken: string | null;
 }
 
 export interface ICategory {
@@ -134,6 +136,7 @@ export interface IAgency {
   name: string;
   description?: string;
   categoryId: number;
+  ownerId: number;
   logo: string;
 }
 
@@ -163,6 +166,7 @@ export interface IRequest {
   customerName: string;
   customerEmail: string;
   userId: number;
+  staffId: number | null;
 }
 
 export interface IStaffRequest {
@@ -178,6 +182,26 @@ export interface IRating {
   agencyId: number;
   userId: number;
   rating: RatingPoint;
+}
+
+export interface IComment {
+  id?: number;
+  agencyId: number;
+  userId: number;
+  comment: string;
+}
+
+export interface INotification {
+  id?: number;
+  content: string | INotificationContent;
+  read: boolean;
+  ownerId: number;
+}
+
+export interface INotificationContent {
+  title: string;
+  body: string;
+  data: Record<any, any>;
 }
 
 export interface PaginationProps {

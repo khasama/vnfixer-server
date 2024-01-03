@@ -5,11 +5,14 @@ import { Category } from "./categories.model";
 import { Request } from "./requests.model";
 import { StaffRequest } from "./staff-request.model";
 import { Rating } from "./rating.model";
+import { Comment } from "./comment.model";
+import { Notification } from "./notifications.model";
 
 User.belongsTo(Branch, {
   foreignKey: "branchId",
   onDelete: "RESTRICT",
   onUpdate: "RESTRICT",
+  as: "branch",
 });
 Branch.hasMany(User, {
   foreignKey: "branchId",
@@ -22,13 +25,26 @@ Branch.belongsTo(Agency, {
   foreignKey: "agencyId",
   onDelete: "RESTRICT",
   onUpdate: "RESTRICT",
-  as: "branches",
+  as: "agency",
 });
 Agency.hasMany(Branch, {
   foreignKey: "agencyId",
   onDelete: "RESTRICT",
   onUpdate: "RESTRICT",
   as: "branches",
+});
+
+Agency.belongsTo(User, {
+  foreignKey: "ownerId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "owner",
+});
+User.hasOne(Agency, {
+  foreignKey: "ownerId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "agency",
 });
 
 Request.belongsTo(Branch, {
@@ -67,6 +83,7 @@ Category.hasMany(Request, {
   foreignKey: "categoryId",
   onDelete: "RESTRICT",
   onUpdate: "RESTRICT",
+  as: "requests",
 });
 
 Request.belongsTo(User, {
@@ -78,6 +95,19 @@ User.hasMany(Request, {
   foreignKey: "userId",
   onDelete: "RESTRICT",
   onUpdate: "RESTRICT",
+});
+
+Request.belongsTo(User, {
+  foreignKey: "staffId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "staff",
+});
+User.hasMany(Request, {
+  foreignKey: "staffId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "requestsTaked",
 });
 
 StaffRequest.belongsTo(User, {
@@ -94,6 +124,7 @@ StaffRequest.belongsTo(Branch, {
   foreignKey: "branchId",
   onDelete: "RESTRICT",
   onUpdate: "RESTRICT",
+  as: "branch",
 });
 Branch.hasMany(StaffRequest, {
   foreignKey: "branchId",
@@ -124,4 +155,51 @@ Agency.hasMany(Rating, {
   as: "ratings",
 });
 
-export { User, Agency, Branch, Category, Request, StaffRequest, Rating };
+Comment.belongsTo(Agency, {
+  foreignKey: "agencyId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+});
+Agency.hasMany(Comment, {
+  foreignKey: "agencyId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "comments",
+});
+
+Comment.belongsTo(User, {
+  foreignKey: "userId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "owner",
+});
+User.hasMany(Comment, {
+  foreignKey: "userId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "comments",
+});
+
+Notification.belongsTo(User, {
+  foreignKey: "ownerId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "owner",
+});
+User.hasMany(Notification, {
+  foreignKey: "ownerId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+});
+
+export {
+  User,
+  Agency,
+  Branch,
+  Category,
+  Request,
+  StaffRequest,
+  Rating,
+  Comment,
+  Notification,
+};

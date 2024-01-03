@@ -6,18 +6,19 @@ import { genAccessToken } from "../utils/jwt";
 import { plainToClass } from "class-transformer";
 import { UserDto } from "../dtos/user/user.dto";
 import createError from "http-errors";
-import { User } from "../models";
+import { Agency, Branch, User } from "../models";
+import { AuthDto } from "../dtos/auth/auth.dto";
 
 interface IAuthService {
-  login(body: LoginDto): Promise<IAuth>;
+  login(body: LoginDto): Promise<AuthDto>;
   register(body: RegisterDto): Promise<{ message: string }>;
-  logout();
+  logout(userId: number);
 }
 
 class AuthServive implements IAuthService {
   private userModel = User;
 
-  async login({ email, password }: LoginDto): Promise<IAuth> {
+  async login({ email, password }: LoginDto): Promise<AuthDto> {
     const user = await this.userModel.findOne({ where: { email }, raw: true });
     if (!user) {
       throw createError.BadRequest("Email not found");
@@ -27,8 +28,25 @@ class AuthServive implements IAuthService {
       throw createError.BadRequest("Wrong password");
     }
     const accessToken = await genAccessToken(plainToClass(UserDto, user));
+    const u = await this.userModel.findOne({
+      where: {
+        id: user.id,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+      ],
+    });
 
-    return { accessToken } as IAuth;
+    return { accessToken, user: u } as AuthDto;
   }
 
   async register({
@@ -49,8 +67,18 @@ class AuthServive implements IAuthService {
     };
   }
 
-  async logout() {
-    throw new Error("Method not implemented.");
+  async logout(userId: number) {
+    await this.userModel.update(
+      {
+        mobileNotiToken: null,
+      },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
+    return true;
   }
 }
 

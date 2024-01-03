@@ -1,7 +1,10 @@
 import createHttpError from "http-errors";
-import { StaffRequest, User } from "../models";
-import { StaffRequestStatus } from "../constants";
+import { Agency, Branch, StaffRequest, User } from "../models";
+import { AgencyRoleType, StaffRequestStatus } from "../constants";
 import { Op } from "sequelize";
+import { UserDto } from "../dtos/user/user.dto";
+import { toData } from "../common/mappers";
+import { encryptData } from "../utils/hashToken";
 
 interface IUserService {
   getAll(): Promise<User[]>;
@@ -31,6 +34,43 @@ class UserServive implements IUserService {
     return user;
   }
 
+  async allStaffRequest(id: number): Promise<StaffRequest[]> {
+    const requests = await this.staffRequestModel.findAll({
+      where: {
+        userId: id,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+      ],
+    });
+    return requests;
+  }
+
+  async updateAgencyStaff(
+    branchId: number,
+    role: AgencyRoleType,
+    userId: number
+  ) {
+    await this.userModel.update(
+      {
+        branchId,
+        agencyRole: role,
+      },
+      {
+        where: { id: userId },
+      }
+    );
+  }
+
   async staffRequest(
     userId: number,
     requestId: number,
@@ -50,15 +90,7 @@ class UserServive implements IUserService {
       throw createHttpError.BadRequest("Request expired");
     }
     if (action === StaffRequestStatus.ACCEPT) {
-      await this.userModel.update(
-        {
-          branchId: request.branchId,
-          agencyRole: request.role,
-        },
-        {
-          where: { id: userId },
-        }
-      );
+      await this.updateAgencyStaff(request.branchId, request.role, userId);
     }
     await this.staffRequestModel.update(
       { status: action },
@@ -66,6 +98,69 @@ class UserServive implements IUserService {
         where: { id: requestId },
       }
     );
+  }
+
+  async updateInfo(userId: number, userDto: UserDto) {
+    await this.userModel.update(toData(userDto), {
+      where: {
+        id: userId,
+      },
+    });
+    const userUpdated = await this.userModel.findOne({
+      where: {
+        id: userId,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+      ],
+    });
+    return userUpdated;
+  }
+
+  async updateNotiToken(userId: number, token: string) {
+    await this.userModel.update(
+      {
+        mobileNotiToken: encryptData(token),
+      },
+      {
+        where: {
+          id: userId,
+        },
+      }
+    );
+  }
+
+  async findWithEmail(email: string): Promise<User[]> {
+    const users = await this.userModel.findAll({
+      where: {
+        email: {
+          [Op.like]: `%${email}%`,
+        },
+      },
+      attributes: ["id", "email", "branchId", "imageUrl"],
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+      ],
+    });
+    return users;
   }
 }
 

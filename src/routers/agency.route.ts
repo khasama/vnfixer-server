@@ -3,6 +3,7 @@ import {
   agencyValidate,
   filterAgenciesValidate,
 } from "../middlewares/validate";
+import { verifyUser } from "../middlewares/verify";
 import { BaseRouter } from "./base.router";
 
 class AgencyRouter extends BaseRouter {
@@ -15,7 +16,12 @@ class AgencyRouter extends BaseRouter {
   protected init() {
     this.router.get("/", filterAgenciesValidate, this._controller.getAll);
     this.router.get("/:id", this._controller.getOne);
-    this.router.post("/", agencyValidate, this._controller.create);
+    this.router.post(
+      "/",
+      verifyUser(),
+      agencyValidate,
+      this._controller.create
+    );
     this.router.put("/:id", agencyValidate, this._controller.update);
   }
 }

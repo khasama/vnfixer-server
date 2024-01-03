@@ -12,6 +12,11 @@ class BranchRouter extends BaseRouter {
     this.init();
   }
   protected init() {
+    this.router.get(
+      "/staffs",
+      verifyAgencyRole(AgencyRoleType.MANAGER),
+      this._controller.allStaffs
+    );
     this.router.get("/:id", this._controller.getOne);
     this.router.post("/", branchValidate, this._controller.create);
     this.router.put("/:id", branchValidate, this._controller.update);
@@ -20,6 +25,11 @@ class BranchRouter extends BaseRouter {
       verifyAgencyRole(AgencyRoleType.MANAGER),
       addStaffValidate,
       this._controller.addStaff
+    );
+    this.router.delete(
+      "/remove-staff/:id",
+      verifyAgencyRole(AgencyRoleType.MANAGER),
+      this._controller.removeStaff
     );
   }
 }

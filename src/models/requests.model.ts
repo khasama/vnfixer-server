@@ -16,6 +16,7 @@ export class Request extends Model implements IRequest {
   customerName: string;
   customerEmail: string;
   userId: number;
+  staffId: number | null;
 }
 
 Request.init(
@@ -69,6 +70,10 @@ Request.init(
       allowNull: false,
     },
     branchId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    staffId: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },

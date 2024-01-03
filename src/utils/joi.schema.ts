@@ -14,18 +14,31 @@ export const categorySchema = Joi.object({
   description: Joi.string().trim(),
 });
 
-export const agencySchema = Joi.object({
-  name: Joi.string().trim().required(),
-  description: Joi.string().trim(),
-  categoryId: Joi.number().required(),
-});
-
 export const branchSchema = Joi.object({
   city: Joi.string()
     .trim()
     .valid(...cities),
   address: Joi.string().trim(),
   agencyId: Joi.number().required(),
+});
+
+export const agencySchema = Joi.object({
+  name: Joi.string().trim().required(),
+  description: Joi.string().trim(),
+  categoryId: Joi.number().required(),
+  branch: Joi.object({
+    city: Joi.string()
+      .trim()
+      .valid(...cities),
+    address: Joi.string().trim(),
+    agencyId: Joi.number(),
+  }),
+});
+
+export const updateInfoSchema = Joi.object({
+  phone: Joi.string().trim().required(),
+  fullName: Joi.string().trim().required(),
+  // address: Joi.string().trim().required(),
 });
 
 export const requestSchema = Joi.object({
@@ -48,6 +61,7 @@ export const filterRequestsSchema = Joi.object({
   limit: Joi.number().optional(),
   page: Joi.number().optional(),
   category: Joi.number().optional(),
+  branchId: Joi.number().optional(),
   status: Joi.string()
     .trim()
     .valid(...Object.values(RequestStatus))
@@ -74,4 +88,12 @@ export const addStaffSchema = Joi.object({
     .trim()
     .valid(...Object.values(AgencyRoleType))
     .required(),
+});
+
+export const updateNotiTokenSchema = Joi.object({
+  token: Joi.string().trim().required(),
+});
+
+export const findWithEmailSchema = Joi.object({
+  email: Joi.string().trim().required(),
 });

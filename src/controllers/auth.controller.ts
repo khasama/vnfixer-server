@@ -3,6 +3,9 @@ import { authService } from "../services/auth.service";
 import { LoginDto } from "../dtos/auth/login.dto";
 import { RegisterDto } from "../dtos/auth/register.dto";
 import { catchAsync } from "../utils/catch-async";
+import { BaseRespone } from "../utils/base-respone";
+import { HttpError } from "../constants";
+import { User } from "../models";
 
 class AuthController {
   private _service = authService;
@@ -19,7 +22,12 @@ class AuthController {
     return res.status(200).json(result);
   });
 
-  logout = catchAsync(async (req: Request, res: Response) => {});
+  logout = catchAsync(async (req: Request, res: Response) => {
+    const user: User = req["user"];
+    await this._service.logout(user.id);
+    const respone = new BaseRespone("success", HttpError.SUCCESS);
+    return res.status(200).json(respone);
+  });
 }
 
 export const authController = new AuthController();

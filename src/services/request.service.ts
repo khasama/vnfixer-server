@@ -1,14 +1,18 @@
 import {
+  AgencyRoleType,
+  INotificationContent,
   PaginationOptions,
   PaginationProps,
   RequestStatus,
 } from "../constants";
 import { RequestDto } from "../dtos/request/request.dto";
-import { Branch, Category, Request } from "../models";
+import { Agency, Branch, Category, Request } from "../models";
 import { toData } from "../common/mappers";
 import createHttpError from "http-errors";
 import { branchService } from "./branch.service";
 import { categoryService } from "./category.service";
+import { UserDto } from "../dtos/user/user.dto";
+import { notificationService } from "./notification.service";
 
 interface IRequestService {
   getAll(): Promise<Request[]>;
@@ -20,13 +24,14 @@ interface IRequestService {
   getOne(id: number): Promise<RequestDto>;
   create(userId: number, requestDto: RequestDto): Promise<RequestDto>;
   update(id: number, requestDto: RequestDto): Promise<RequestDto>;
-  changeStatus(id: number, status: RequestStatus): Promise<RequestDto>;
+  changeStatus(user: UserDto, requestId: number, status: RequestStatus);
 }
 
 class RequestServive implements IRequestService {
   private requestModel = Request;
   private branchService = branchService;
   private categoryService = categoryService;
+  private notificationService = notificationService;
 
   async getAll(): Promise<Request[]> {
     const requests = await this.requestModel.findAll({
@@ -139,9 +144,28 @@ class RequestServive implements IRequestService {
     return await this.getOne({ id });
   }
 
-  async changeStatus(id: number, status: RequestStatus): Promise<RequestDto> {
+  async changeStatus(user: UserDto, requestId: number, status: RequestStatus) {
     if (!Object.values(RequestStatus).includes(status)) {
       throw createHttpError.BadRequest("Status invalid");
+    }
+    const request = await this.getOne({ id: requestId });
+    if (!user.branchId) {
+      throw createHttpError.Forbidden("You are not staff");
+    }
+    if (
+      user.agencyRole === AgencyRoleType.STAFF &&
+      request.staffId !== user.id
+    ) {
+      throw createHttpError.Forbidden("This request not assign for you");
+    }
+    if (
+      user.agencyRole === AgencyRoleType.MANAGER &&
+      request.branchId &&
+      request.branchId !== user.branchId
+    ) {
+      throw createHttpError.Forbidden(
+        "You can not change status of this request"
+      );
     }
     const [count] = await this.requestModel.update(
       {
@@ -149,30 +173,185 @@ class RequestServive implements IRequestService {
       },
       {
         where: {
-          id,
+          id: requestId,
         },
       }
     );
     if (count === 0) {
       throw createHttpError.NotFound("Not found");
     }
-    return await this.getOne({ id });
+    let notificationContent: INotificationContent;
+    if (status === RequestStatus.DONE) {
+      notificationContent = {
+        title: "Yêu cầu của bạn đã được hoàn thành",
+        body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được hoàn thành`,
+        data: {},
+      };
+    } else if (status === RequestStatus.CANCEL) {
+      notificationContent = {
+        title: "Yêu cầu của bạn đã bị hủy bỏ",
+        body: `Yêu cầu sửa chữa: ${request.title} của bạn đã bị hủy bỏ`,
+        data: {},
+      };
+    } else if (
+      status === RequestStatus.PICKED ||
+      status === RequestStatus.PENDING
+    ) {
+      notificationContent = {
+        title: `Yêu cầu của bạn đã được chuyển về trạng thái ${status}`,
+        body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được chuyển về trạng thái ${status}`,
+        data: {},
+      };
+    }
+
+    await this.notificationService.send(request.userId, notificationContent);
   }
 
-  async takeRequest(branchId: number, requestId: number) {
-    if (!branchId || !requestId) {
+  async takeRequest(user: UserDto, requestId: number) {
+    if (!user.branchId || !requestId) {
       throw createHttpError.BadRequest("Missing param(s)");
     }
-    const request = await this.getOne({ id: requestId });
-    if (request.status !== RequestStatus.PENDING) {
+    const requestTaked = await this.requestModel.findOne({
+      where: {
+        staffId: user.id,
+        status: RequestStatus.ACCEPT,
+      },
+    });
+    if (requestTaked) {
+      throw createHttpError.BadRequest("Please done the request is processing");
+    }
+    const request = await this.requestModel.findOne({
+      where: { id: requestId },
+    });
+    if (request.status !== RequestStatus.PICKED || request.staffId) {
       throw createHttpError.BadRequest("Request not available");
     }
     const dataUpdate = {
       ...request,
       status: RequestStatus.ACCEPT,
-      branchId,
+      branchId: user.branchId,
+      staffId: user.id,
     };
     await this.update(requestId, dataUpdate);
+    const notificationContent: INotificationContent = {
+      title: "Yêu cầu của bạn đã được nhận",
+      body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được nhận bời một nhân viên của đại lý`,
+      data: {},
+    };
+    await this.notificationService.send(request.userId, notificationContent);
+    return this.requestToTake(user);
+  }
+
+  async pickRequest(user: UserDto, requestId: number) {
+    if (!user.branchId || !requestId) {
+      throw createHttpError.BadRequest("Missing param(s)");
+    }
+    const request = await this.requestModel.findOne({
+      where: { id: requestId },
+    });
+    if (
+      request.status !== RequestStatus.PENDING ||
+      (request.branchId && request.branchId !== user.branchId)
+    ) {
+      throw createHttpError.BadRequest("Request not available");
+    }
+    const dataUpdate = {
+      ...request,
+      status: RequestStatus.PICKED,
+      branchId: user.branchId,
+    };
+    await this.update(requestId, dataUpdate);
+    const notificationContent: INotificationContent = {
+      title: "Yêu cầu của bạn đã được chọn",
+      body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được chọn bởi một đại lý sửa chữa`,
+      data: {},
+    };
+    await this.notificationService.send(request.userId, notificationContent);
+    return this.requestToTake(user);
+  }
+
+  async myRequest(id: number): Promise<RequestDto[]> {
+    const requests = await this.requestModel.findAll({
+      where: {
+        userId: id,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+        {
+          model: Category,
+          as: "category",
+        },
+      ],
+    });
+    return requests;
+  }
+
+  async requestToTake(user: UserDto): Promise<RequestDto[]> {
+    if (!user.branchId || !user.agencyRole) {
+      throw createHttpError.Forbidden("You are not staff");
+    }
+    const requests = await this.requestModel.findAll({
+      where: {
+        branchId: user.branchId,
+        status: RequestStatus.PICKED,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+        {
+          model: Category,
+          as: "category",
+        },
+      ],
+    });
+    return requests;
+  }
+
+  async requestTaked(user: UserDto): Promise<RequestDto> {
+    if (!user.branchId || !user.agencyRole) {
+      throw createHttpError.Forbidden("You are not staff");
+    }
+    const request = await this.requestModel.findOne({
+      where: {
+        branchId: user.branchId,
+        status: RequestStatus.ACCEPT,
+        staffId: user.id,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          include: [
+            {
+              model: Agency,
+              as: "agency",
+            },
+          ],
+        },
+        {
+          model: Category,
+          as: "category",
+        },
+      ],
+    });
+    return request;
   }
 }
 

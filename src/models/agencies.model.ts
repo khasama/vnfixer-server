@@ -9,6 +9,7 @@ export class Agency extends Model implements IAgency {
   description: string;
   logo: string;
   categoryId: number;
+  ownerId: number;
 }
 
 Agency.init(
@@ -34,6 +35,9 @@ Agency.init(
         model: Category,
         key: "id",
       },
+    },
+    ownerId: {
+      type: DataTypes.INTEGER,
     },
   },
   {

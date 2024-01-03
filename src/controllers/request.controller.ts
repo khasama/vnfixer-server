@@ -15,7 +15,9 @@ class RequestController {
       limit: parseInt(String(req.query.limit)) || 10,
       sort: String(req.query.page),
     };
-    const filter = {};
+    const filter = {
+      branchId: null,
+    };
     if (req.query.city) {
       filter["city"] = req.query.city;
     }
@@ -24,6 +26,9 @@ class RequestController {
     }
     if (req.query.category) {
       filter["categoryId"] = parseInt(String(req.query.category));
+    }
+    if (req.query.branchId) {
+      filter["branchId"] = parseInt(String(req.query.branchId));
     }
     const result = await this._service.getAllWithPagination(filter, options);
     const respone = new BaseRespone("success", HttpError.SUCCESS, result);
@@ -55,8 +60,9 @@ class RequestController {
 
   changeStatus = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
+    const user: User = req["user"];
     const status = req.query.status as RequestStatus;
-    const result = await this._service.changeStatus(parseInt(id), status);
+    const result = await this._service.changeStatus(user, parseInt(id), status);
     const respone = new BaseRespone("success", HttpError.SUCCESS, result);
     return res.status(HttpError.SUCCESS).json(respone);
   });
@@ -64,8 +70,37 @@ class RequestController {
   takeRequest = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const user: User = req["user"];
-    await this._service.takeRequest(user.branchId, parseInt(id));
+    await this._service.takeRequest(user, parseInt(id));
     const respone = new BaseRespone("success", HttpError.SUCCESS);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
+
+  pickRequest = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const user: User = req["user"];
+    await this._service.pickRequest(user, parseInt(id));
+    const respone = new BaseRespone("success", HttpError.SUCCESS);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
+
+  myRequests = catchAsync(async (req: Request, res: Response) => {
+    const user: User = req["user"];
+    const result = await this._service.myRequest(user.id);
+    const respone = new BaseRespone("success", HttpError.SUCCESS, result);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
+
+  requestToTake = catchAsync(async (req: Request, res: Response) => {
+    const user: User = req["user"];
+    const result = await this._service.requestToTake(user);
+    const respone = new BaseRespone("success", HttpError.SUCCESS, result);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
+
+  requestTaked = catchAsync(async (req: Request, res: Response) => {
+    const user: User = req["user"];
+    const result = await this._service.requestTaked(user);
+    const respone = new BaseRespone("success", HttpError.SUCCESS, result);
     return res.status(HttpError.SUCCESS).json(respone);
   });
 }

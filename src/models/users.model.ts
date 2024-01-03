@@ -14,6 +14,7 @@ export class User extends Model implements IUser {
   role: RoleType;
   branchId: number | null;
   agencyRole: AgencyRoleType | null;
+  mobileNotiToken: string | null;
 }
 
 User.init(
@@ -59,6 +60,9 @@ User.init(
       type: DataTypes.ENUM({ values: Object.values(AgencyRoleType) }),
       allowNull: true,
       defaultValue: null,
+    },
+    mobileNotiToken: {
+      type: DataTypes.STRING,
     },
   },
   {

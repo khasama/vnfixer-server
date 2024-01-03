@@ -7,7 +7,10 @@ import {
   categorySchema,
   filterAgenciesSchema,
   filterRequestsSchema,
+  findWithEmailSchema,
   requestSchema,
+  updateInfoSchema,
+  updateNotiTokenSchema,
 } from "../utils/joi.schema";
 import Joi from "joi";
 
@@ -37,5 +40,8 @@ export const agencyValidate = validate(agencySchema);
 export const branchValidate = validate(branchSchema);
 export const requestValidate = validate(requestSchema);
 export const addStaffValidate = validate(addStaffSchema);
+export const updateInfoValidate = validate(updateInfoSchema);
+export const updateNotiTokenValidate = validate(updateNotiTokenSchema);
 export const filterRequestsValidate = validateQuery(filterRequestsSchema);
 export const filterAgenciesValidate = validateQuery(filterAgenciesSchema);
+export const findWithEmailSchemaValidate = validateQuery(findWithEmailSchema);
