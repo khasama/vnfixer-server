@@ -5,6 +5,7 @@ import {
   authSchema,
   branchSchema,
   categorySchema,
+  chatbotSchema,
   filterAgenciesSchema,
   filterRequestsSchema,
   findWithEmailSchema,
@@ -42,6 +43,7 @@ export const requestValidate = validate(requestSchema);
 export const addStaffValidate = validate(addStaffSchema);
 export const updateInfoValidate = validate(updateInfoSchema);
 export const updateNotiTokenValidate = validate(updateNotiTokenSchema);
+export const chatbotValidate = validate(chatbotSchema);
 export const filterRequestsValidate = validateQuery(filterRequestsSchema);
 export const filterAgenciesValidate = validateQuery(filterAgenciesSchema);
 export const findWithEmailSchemaValidate = validateQuery(findWithEmailSchema);

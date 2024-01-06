@@ -31,6 +31,25 @@ export enum StaffRequestStatus {
   REJECT = "REJECT",
 }
 
+export enum CategoryKey {
+  XE_MAY = "category.xemay",
+  DO_GIA_DUNG = "category.dogiadung",
+  NOI_THAT = "category.noithat",
+  DIEN_LANH = "category.dienlanh",
+  DIEN_NUOC = "category.diennuoc",
+  AN_NINH = "category.anninh",
+  VAN_PHONG = "category.vanphong",
+}
+
+export enum Intent {
+  HELLO = "greetings.hello",
+  BYE = "greetings.bye",
+  LIST_CATEGORIES = "list.categories",
+  NONE = "None",
+}
+
+export type ChatbotIntent = Intent | CategoryKey;
+
 export const cities = [
   "An Giang",
   "Bà Rịa - Vũng Tàu",
@@ -128,6 +147,7 @@ export interface IUser {
 export interface ICategory {
   id?: number;
   name: string;
+  key: string;
   description?: string;
 }
 

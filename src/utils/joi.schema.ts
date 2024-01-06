@@ -97,3 +97,7 @@ export const updateNotiTokenSchema = Joi.object({
 export const findWithEmailSchema = Joi.object({
   email: Joi.string().trim().required(),
 });
+
+export const chatbotSchema = Joi.object({
+  question: Joi.string().trim().required(),
+});

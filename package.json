@@ -6,7 +6,8 @@
   "scripts": {
     "start": "npm run clean && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "tsc --build --clean && tsc"
+    "build": "tsc && copyfiles -f src/nlp/*.nlp dist/nlp/",
+    "clean": "rimraf dist/ && npm run build"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +27,8 @@
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.6.1",
+    "node-nlp": "^4.27.0",
+    "node-nlp-typescript": "^1.0.3",
     "sequelize": "^6.33.0",
     "swagger-ui-express": "^5.0.0"
   },
@@ -38,6 +41,8 @@
     "@types/jsonwebtoken": "^9.0.3",
     "@types/node": "^20.8.3",
     "@types/swagger-ui-express": "^4.1.4",
+    "copyfiles": "^2.4.1",
+    "rimraf": "^5.0.5",
     "ts-node": "^10.9.1",
     "tslint": "^6.1.3",
     "typescript": "^5.2.2"

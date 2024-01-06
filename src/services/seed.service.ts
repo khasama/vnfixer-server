@@ -1,4 +1,4 @@
-import { AgencyRoleType, RoleType, cities } from "../constants";
+import { AgencyRoleType, CategoryKey, RoleType, cities } from "../constants";
 import { Agency, Branch, Category, User } from "../models";
 import bcrypt from "bcrypt";
 
@@ -79,37 +79,44 @@ class SeedServive {
     const categories = await this.categoryModel.bulkCreate([
       {
         name: "Sửa chữa xe máy",
+        key: CategoryKey.XE_MAY,
         description: "",
       },
       {
         name: "Sửa chữa thiết bị văn phòng",
+        key: CategoryKey.VAN_PHONG,
         description: "(Máy in, máy fax, máy photo, scan, ...)",
       },
       {
         name: "Sửa chữa đồ gia dụng",
+        key: CategoryKey.DO_GIA_DUNG,
         description: "(Quạt, nồi cơm, biếp gas, lò vi sóng, ...)",
       },
       {
         name: "Sửa chữa điện lạnh",
+        key: CategoryKey.DIEN_LANH,
         description: "(Tủ lạnh, điều hoà, máy giặt, ...)",
       },
       {
         name: "Sửa chữa nội thất",
+        key: CategoryKey.NOI_THAT,
         description: "(Bàn, ghế, tủ, kệ, ...)",
       },
       {
         name: "Sửa chữa điện nước",
+        key: CategoryKey.DIEN_NUOC,
         description: "(đường ống nước, đường dây điện)",
       },
       {
         name: "Sửa chữa hệ thống an ninh",
+        key: CategoryKey.AN_NINH,
         description: "(Camera, thiết bị chống trộm, máy quét vân tay, ...)",
       },
     ]);
 
     for (const user of users) {
       const agency = await this.agencyModel.create({
-        name: `Agency ${user}`,
+        name: `Agency ${user.email}`,
         description: `This is description of agency ${user.id}`,
         ownerId: user.id,
         categoryId:
