@@ -32,6 +32,7 @@ class ChatbotServive implements IChatbotService {
       answer,
       data: null,
       type: "text",
+      canDetect: true,
     };
     if ((Object.values(CategoryKey) as string[]).includes(intent)) {
       response.data = await this.getTopAgencies(intent);
@@ -44,6 +45,7 @@ class ChatbotServive implements IChatbotService {
     if (intent === Intent.NONE) {
       response.answer =
         "Xin lỗi, chủ đề này nằm ngoài sự hiểu biết của tôi, bạn có thể đưa ra câu hỏi khác không?";
+      response.canDetect = false;
     }
     return response;
   }
