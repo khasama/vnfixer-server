@@ -11,12 +11,7 @@ class ChatbotRouter extends BaseRouter {
     this.init();
   }
   protected init() {
-    this.router.post(
-      "/ask",
-      verifyUser(),
-      chatbotValidate,
-      this._controller.ask
-    );
+    this.router.post("/ask", chatbotValidate, this._controller.ask);
   }
 }
 

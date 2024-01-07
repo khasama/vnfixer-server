@@ -28,6 +28,7 @@ class ChatbotServive implements IChatbotService {
     const { intent, answer }: { intent: ChatbotIntent; answer: string } =
       result;
     const response = {
+      question,
       answer,
       data: null,
       type: "text",
