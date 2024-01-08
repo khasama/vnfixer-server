@@ -12,12 +12,14 @@ export const authSchema = Joi.object({
 export const categorySchema = Joi.object({
   name: Joi.string().trim().required(),
   description: Joi.string().trim(),
+  key: Joi.string().trim().required(),
 });
 
 export const branchSchema = Joi.object({
   city: Joi.string()
     .trim()
     .valid(...cities),
+  district: Joi.string().trim().required(),
   address: Joi.string().trim(),
   agencyId: Joi.number().required(),
 });
@@ -25,6 +27,9 @@ export const branchSchema = Joi.object({
 export const agencySchema = Joi.object({
   name: Joi.string().trim().required(),
   description: Joi.string().trim(),
+  website: Joi.string().trim(),
+  zalo: Joi.string().trim(),
+  fanpage: Joi.string().trim(),
   categoryId: Joi.number().required(),
   branch: Joi.object({
     city: Joi.string()
@@ -42,7 +47,7 @@ export const updateInfoSchema = Joi.object({
 });
 
 export const requestSchema = Joi.object({
-  title: Joi.string().trim().required(),
+  // title: Joi.string().trim().required(),
   description: Joi.string().trim(),
   location: Joi.string().trim().required(),
   expectDate: Joi.array().items(Joi.date().format("YYYY-MM-DD").required()),
@@ -52,6 +57,7 @@ export const requestSchema = Joi.object({
   customerPhone: Joi.string().trim().required(),
   customerName: Joi.string().trim().required(),
   customerEmail: Joi.string().trim().required(),
+  district: Joi.string().trim().required(),
   city: Joi.string()
     .trim()
     .valid(...cities),

@@ -5,6 +5,7 @@ import { IBranch, cities } from "../constants";
 export class Branch extends Model implements IBranch {
   id: number;
   city: string;
+  district: string;
   address: string;
   agencyId: number;
 }
@@ -21,6 +22,10 @@ Branch.init(
       allowNull: false,
     },
     address: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    district: {
       type: DataTypes.STRING,
       allowNull: false,
     },

@@ -23,6 +23,7 @@ export enum RequestStatus {
   ACCEPT = "ACCEPT",
   DONE = "DONE",
   CANCEL = "CANCEL",
+  PAID = "PAID",
 }
 
 export enum StaffRequestStatus {
@@ -155,6 +156,9 @@ export interface IAgency {
   id?: number;
   name: string;
   description?: string;
+  website?: string;
+  zalo?: string;
+  fanpage?: string;
   categoryId: number;
   ownerId: number;
   logo: string;
@@ -168,15 +172,16 @@ export interface IAgencyCategory {
 export interface IBranch {
   id?: number;
   city: string;
+  district: string;
   address: string;
   agencyId: number;
 }
 
 export interface IRequest {
   id?: number;
-  title: string;
   description: string;
   city: string;
+  district: string;
   location: string;
   expectDate: string | string[];
   status: string;
@@ -187,6 +192,7 @@ export interface IRequest {
   customerEmail: string;
   userId: number;
   staffId: number | null;
+  pickerId: number | null;
 }
 
 export interface IStaffRequest {
