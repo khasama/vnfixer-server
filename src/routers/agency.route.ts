@@ -15,6 +15,16 @@ class AgencyRouter extends BaseRouter {
   }
   protected init() {
     this.router.get("/", filterAgenciesValidate, this._controller.getAll);
+    this.router.get(
+      "/payment/:id",
+      verifyUser(),
+      this._controller.getPaymentInfo
+    );
+    this.router.post(
+      "/payment/:id",
+      verifyUser(),
+      this._controller.agencyPayment
+    );
     this.router.get("/:id", this._controller.getOne);
     this.router.post(
       "/",

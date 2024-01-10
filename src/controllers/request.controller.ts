@@ -30,6 +30,9 @@ class RequestController {
     if (req.query.branchId) {
       filter["branchId"] = parseInt(String(req.query.branchId));
     }
+    if (req.query.staffId) {
+      filter["staffId"] = parseInt(String(req.query.staffId));
+    }
     const result = await this._service.getAllWithPagination(filter, options);
     const respone = new BaseRespone("success", HttpError.SUCCESS, result);
     return res.status(HttpError.SUCCESS).json(respone);

@@ -29,6 +29,7 @@
     "mysql2": "^3.6.1",
     "node-nlp": "^4.27.0",
     "node-nlp-typescript": "^1.0.3",
+    "qs": "^6.11.2",
     "sequelize": "^6.33.0",
     "swagger-ui-express": "^5.0.0"
   },

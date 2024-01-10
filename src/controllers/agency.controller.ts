@@ -56,6 +56,30 @@ class AgencyController {
     const respone = new BaseRespone("success", HttpError.SUCCESS, result);
     return res.status(HttpError.SUCCESS).json(respone);
   });
+
+  getPaymentInfo = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { id: userId } = req["user"];
+    const result = await this._service.getPaymentInfo(parseInt(id), userId);
+    const respone = new BaseRespone("success", HttpError.SUCCESS, result);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
+
+  agencyPayment = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { id: userId } = req["user"];
+    const { requestIds, bankCode } = req.body;
+    const ipAddr = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    const result = await this._service.agencyPayment(
+      parseInt(id),
+      userId,
+      requestIds as number[],
+      ipAddr,
+      bankCode as string
+    );
+    const respone = new BaseRespone("success", HttpError.SUCCESS, result);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
 }
 
 export const agencyController = new AgencyController();

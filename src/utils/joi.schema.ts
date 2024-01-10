@@ -27,9 +27,9 @@ export const branchSchema = Joi.object({
 export const agencySchema = Joi.object({
   name: Joi.string().trim().required(),
   description: Joi.string().trim(),
-  website: Joi.string().trim(),
-  zalo: Joi.string().trim(),
-  fanpage: Joi.string().trim(),
+  website: Joi.string().trim().optional(),
+  zalo: Joi.string().trim().optional(),
+  fanpage: Joi.string().trim().optional(),
   categoryId: Joi.number().required(),
   branch: Joi.object({
     city: Joi.string()
@@ -68,6 +68,7 @@ export const filterRequestsSchema = Joi.object({
   page: Joi.number().optional(),
   category: Joi.number().optional(),
   branchId: Joi.number().optional(),
+  staffId: Joi.number().optional(),
   status: Joi.string()
     .trim()
     .valid(...Object.values(RequestStatus))

@@ -29,7 +29,6 @@ interface IRequestService {
 
 class RequestServive implements IRequestService {
   private requestModel = Request;
-  private branchService = branchService;
   private categoryService = categoryService;
   private notificationService = notificationService;
 

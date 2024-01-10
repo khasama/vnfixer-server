@@ -13,7 +13,7 @@ import { Op, Sequelize, where } from "sequelize";
 import { UserDto } from "../dtos/user/user.dto";
 import { userService } from "./users.service";
 import { BranchDto } from "../dtos/branch/branch.dto";
-import { branchService } from "./branch.service";
+import { genVnpayUrl } from "../utils/genVnpayUrl";
 
 interface IAgencyService {
   getAll(): Promise<Agency[]>;
@@ -31,6 +31,7 @@ interface IAgencyService {
 class AgencyServive implements IAgencyService {
   private agencyModel = Agency;
   private branchModel = Branch;
+  private requestModel = Request;
   private categoryService = categoryService;
   private userService = userService;
 
@@ -193,6 +194,51 @@ class AgencyServive implements IAgencyService {
     }
     const agencyUpdated = await this.getOne({ id });
     return agencyUpdated;
+  }
+
+  async getPaymentInfo(id: number, userId: number) {
+    const agency = await this.agencyModel.findOne({ where: { id } });
+    if (!agency) {
+      throw new createHttpError.BadRequest("Agency not exist !!!");
+    }
+    if (agency.ownerId !== userId) {
+      throw new createHttpError.BadRequest("You not is owner of this agency");
+    }
+    const requests = await this.requestModel.findAll({
+      where: {
+        status: RequestStatus.DONE,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          where: {
+            agencyId: agency.id,
+          },
+        },
+      ],
+    });
+
+    return { agency, requests };
+  }
+
+  async agencyPayment(
+    id: number,
+    userId: number,
+    requestIds: number[],
+    ipAddr,
+    bankCode: string = ""
+  ) {
+    const agency = await this.agencyModel.findOne({ where: { id } });
+    if (!agency) {
+      throw new createHttpError.BadRequest("Agency not exist !!!");
+    }
+    if (agency.ownerId !== userId) {
+      throw new createHttpError.BadRequest("You not is owner of this agency");
+    }
+
+    const paymentUrl = genVnpayUrl(ipAddr, bankCode, 100000, "123");
+    return paymentUrl;
   }
 }
 
