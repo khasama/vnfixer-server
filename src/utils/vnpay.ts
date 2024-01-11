@@ -10,13 +10,14 @@ export function genVnpayUrl(
   bankCode: string,
   amount: number,
   orderInfo: string,
+  returnUrl: string,
   orderType = "billpayment",
   locale = "vn"
 ) {
   const tmnCode = process.env.VNP_TMNCODE;
   const secretKey = process.env.VNP_HASHSECRET;
   const vnpUrl = process.env.VNP_URL;
-  const returnUrl = process.env.VNP_RETURNURL;
+  // const returnUrl = process.env.VNP_RETURNURL;
 
   const date = new Date();
 
@@ -51,6 +52,20 @@ export function genVnpayUrl(
   const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
   vnp_Params["vnp_SecureHash"] = signed;
   return `${vnpUrl}?${querystring.stringify(vnp_Params, { encode: false })}`;
+}
+
+export function checkVnpayPayment(vnpParams: Record<any, any>) {
+  const secureHash = vnpParams["vnp_SecureHash"];
+  delete vnpParams["vnp_SecureHash"];
+  delete vnpParams["vnp_SecureHashType"];
+  vnpParams = sortObject(vnpParams);
+  const secretKey = process.env.VNP_HASHSECRET;
+
+  const signData = querystring.stringify(vnpParams, { encode: false });
+  const hmac = crypto.createHmac("sha512", secretKey);
+  const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
+
+  return secureHash === signed;
 }
 
 function sortObject(obj: object) {

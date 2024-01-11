@@ -1,5 +1,6 @@
 import { agencyController } from "../controllers/agency.controller";
 import {
+  agencyPaymentValidate,
   agencyValidate,
   filterAgenciesValidate,
 } from "../middlewares/validate";
@@ -23,6 +24,7 @@ class AgencyRouter extends BaseRouter {
     this.router.post(
       "/payment/:id",
       verifyUser(),
+      agencyPaymentValidate,
       this._controller.agencyPayment
     );
     this.router.get("/:id", this._controller.getOne);

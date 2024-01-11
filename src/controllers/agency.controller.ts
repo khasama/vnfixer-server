@@ -68,14 +68,15 @@ class AgencyController {
   agencyPayment = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const { id: userId } = req["user"];
-    const { requestIds, bankCode } = req.body;
+    const { requestIds, bankCode, returnUrl } = req.body;
     const ipAddr = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
     const result = await this._service.agencyPayment(
       parseInt(id),
       userId,
       requestIds as number[],
       ipAddr,
-      bankCode as string
+      bankCode as string,
+      returnUrl as string
     );
     const respone = new BaseRespone("success", HttpError.SUCCESS, result);
     return res.status(HttpError.SUCCESS).json(respone);

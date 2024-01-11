@@ -14,6 +14,7 @@ import { seedRouter } from "./seed.route";
 import { notificationRouter } from "./notification.route";
 import { commentRouter } from "./comment.route";
 import { chatbotRouter } from "./chatbot.route";
+import { paymentRouter } from "./payment.route";
 
 class MasterRouter extends BaseRouter {
   constructor() {
@@ -55,6 +56,7 @@ class MasterRouter extends BaseRouter {
     this.router.use("/comments", commentRouter);
     this.router.use("/chatbot", chatbotRouter);
     this.router.use("/seed", seedRouter);
+    this.router.use("/payment", paymentRouter);
 
     this.router.use(errorController.error);
   }

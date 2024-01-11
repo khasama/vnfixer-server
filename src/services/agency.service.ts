@@ -9,11 +9,11 @@ import {
   PaginationProps,
   RequestStatus,
 } from "../constants";
-import { Op, Sequelize, where } from "sequelize";
+import { Op } from "sequelize";
 import { UserDto } from "../dtos/user/user.dto";
 import { userService } from "./users.service";
 import { BranchDto } from "../dtos/branch/branch.dto";
-import { genVnpayUrl } from "../utils/genVnpayUrl";
+import { genVnpayUrl } from "../utils/vnpay";
 
 interface IAgencyService {
   getAll(): Promise<Agency[]>;
@@ -216,6 +216,11 @@ class AgencyServive implements IAgencyService {
             agencyId: agency.id,
           },
         },
+        {
+          model: User,
+          as: "staff",
+          attributes: ["id", "email"],
+        },
       ],
     });
 
@@ -227,7 +232,8 @@ class AgencyServive implements IAgencyService {
     userId: number,
     requestIds: number[],
     ipAddr,
-    bankCode: string = ""
+    bankCode: string = "",
+    returnUrl: string
   ) {
     const agency = await this.agencyModel.findOne({ where: { id } });
     if (!agency) {
@@ -237,7 +243,7 @@ class AgencyServive implements IAgencyService {
       throw new createHttpError.BadRequest("You not is owner of this agency");
     }
 
-    const paymentUrl = genVnpayUrl(ipAddr, bankCode, 100000, "123");
+    const paymentUrl = genVnpayUrl(ipAddr, bankCode, 100000, "123", returnUrl);
     return paymentUrl;
   }
 }

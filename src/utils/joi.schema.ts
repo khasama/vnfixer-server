@@ -32,6 +32,7 @@ export const agencySchema = Joi.object({
   fanpage: Joi.string().trim().optional(),
   categoryId: Joi.number().required(),
   branch: Joi.object({
+    district: Joi.string().trim().required(),
     city: Joi.string()
       .trim()
       .valid(...cities),
@@ -91,6 +92,7 @@ export const filterAgenciesSchema = Joi.object({
 
 export const addStaffSchema = Joi.object({
   userId: Joi.number().required(),
+  branchId: Joi.number().required(),
   role: Joi.string()
     .trim()
     .valid(...Object.values(AgencyRoleType))
@@ -107,4 +109,10 @@ export const findWithEmailSchema = Joi.object({
 
 export const chatbotSchema = Joi.object({
   question: Joi.string().trim().required(),
+});
+
+export const agencyPaymentSchema = Joi.object({
+  requestIds: Joi.array().items(Joi.number()),
+  returnUrl: Joi.string().trim().required(),
+  bankCode: Joi.string().trim(),
 });
