@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { catchAsync } from "../utils/catch-async";
 import { BaseRespone } from "../utils/base-respone";
-import { HttpError } from "../constants";
+import { HttpError, IUser } from "../constants";
 import { agencyService } from "../services/agency.service";
 
 class AgencyController {
@@ -67,12 +67,12 @@ class AgencyController {
 
   agencyPayment = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { id: userId } = req["user"];
+    const user: IUser = req["user"];
     const { requestIds, bankCode, returnUrl } = req.body;
     const ipAddr = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
     const result = await this._service.agencyPayment(
       parseInt(id),
-      userId,
+      user,
       requestIds as number[],
       ipAddr,
       bankCode as string,

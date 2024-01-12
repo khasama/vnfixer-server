@@ -1,12 +1,14 @@
 import createHttpError from "http-errors";
-import { Agency, User } from "../models";
+import { Agency, Branch, Payment, Request } from "../models";
 import { checkVnpayPayment } from "../utils/vnpay";
+import { RATE_PER_REQUEST, RequestStatus } from "../constants";
 
 interface IPaymentService {}
 
 class PaymentServive implements IPaymentService {
-  private userModel = User;
+  private requestModel = Request;
   private agencyModel = Agency;
+  private paymentModel = Payment;
 
   async checkPaymentResult(
     agencyId: number,
@@ -22,7 +24,36 @@ class PaymentServive implements IPaymentService {
     }
 
     const paymentSucess = checkVnpayPayment(paymentPayload);
-
+    const requests = await this.requestModel.findAll({
+      where: {
+        status: RequestStatus.PAYMENT_PENDING,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          where: {
+            agencyId: agency.id,
+          },
+        },
+      ],
+    });
+    const requestIds = requests.map((request) => request.id);
+    const [affectedCount] = await this.requestModel.update(
+      {
+        status: paymentSucess ? RequestStatus.PAID : RequestStatus.DONE,
+      },
+      {
+        where: {
+          id: requestIds,
+        },
+      }
+    );
+    await this.paymentModel.create({
+      userId,
+      agencyId,
+      total: affectedCount * RATE_PER_REQUEST,
+    });
     return {
       paymentStatus: paymentSucess ? "success" : "failed",
       message: paymentSucess ? "Thanh toán thành công" : "Thanh toán thất bại",

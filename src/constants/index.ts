@@ -1,3 +1,6 @@
+export const RATE_PER_REQUEST = 2000;
+export const MIN_TOTAL = 10000;
+
 export enum RoleType {
   ADMIN = "ADMIN",
   CUSTOMER = "CUSTOMER",
@@ -23,6 +26,7 @@ export enum RequestStatus {
   ACCEPT = "ACCEPT",
   DONE = "DONE",
   CANCEL = "CANCEL",
+  PAYMENT_PENDING = "PAYMENT_PENDING",
   PAID = "PAID",
 }
 
@@ -239,4 +243,11 @@ export interface PaginationOptions {
   sort: string;
   page: number;
   limit: number;
+}
+
+export interface IPaymentInformation {
+  id?: number;
+  userId: number;
+  agencyId: number;
+  total: number;
 }

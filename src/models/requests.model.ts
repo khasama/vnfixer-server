@@ -28,7 +28,7 @@ Request.init(
       primaryKey: true,
     },
     description: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT("medium"),
     },
     city: {
       type: DataTypes.ENUM({ values: cities }),
