@@ -7,6 +7,7 @@ import { StaffRequest } from "./staff-request.model";
 import { Rating } from "./rating.model";
 import { Comment } from "./comment.model";
 import { Notification } from "./notifications.model";
+import { Payment } from "./payment.model";
 
 User.belongsTo(Branch, {
   foreignKey: "branchId",
@@ -110,6 +111,18 @@ User.hasMany(Request, {
   as: "requestsTaked",
 });
 
+Request.belongsTo(User, {
+  foreignKey: "pickerId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+  as: "picker",
+});
+User.hasMany(Request, {
+  foreignKey: "pickerId",
+  onDelete: "RESTRICT",
+  onUpdate: "RESTRICT",
+});
+
 StaffRequest.belongsTo(User, {
   foreignKey: "userId",
   onDelete: "RESTRICT",
@@ -202,4 +215,5 @@ export {
   Rating,
   Comment,
   Notification,
+  Payment,
 };

@@ -5,6 +5,7 @@ import { ICategory } from "../constants";
 export class Category extends Model implements ICategory {
   id: number;
   name: string;
+  key: string;
   description?: string;
 }
 
@@ -19,8 +20,12 @@ Category.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    description: {
+    key: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT("medium"),
       allowNull: true,
     },
   },

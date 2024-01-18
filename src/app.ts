@@ -3,6 +3,7 @@ import { Server } from "./server";
 import * as swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./utils/swagger.json";
 import dotenv from "dotenv";
+import cors from "cors";
 
 /**
  * Application class.
@@ -32,6 +33,12 @@ export class Application {
         "/api-docs",
         swaggerUi.serve,
         swaggerUi.setup(swaggerDocument)
+      );
+      this.server.app.use(
+        cors({
+          origin: "*",
+          credentials: true,
+        })
       );
       this.server.app.use("/api", this.server.router);
       this.server.app.listen(port, () => {

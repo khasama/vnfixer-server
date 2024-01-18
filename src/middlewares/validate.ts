@@ -1,10 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import {
   addStaffSchema,
+  agencyPaymentSchema,
   agencySchema,
   authSchema,
   branchSchema,
   categorySchema,
+  chatbotSchema,
   filterAgenciesSchema,
   filterRequestsSchema,
   findWithEmailSchema,
@@ -42,6 +44,8 @@ export const requestValidate = validate(requestSchema);
 export const addStaffValidate = validate(addStaffSchema);
 export const updateInfoValidate = validate(updateInfoSchema);
 export const updateNotiTokenValidate = validate(updateNotiTokenSchema);
+export const chatbotValidate = validate(chatbotSchema);
+export const agencyPaymentValidate = validate(agencyPaymentSchema);
 export const filterRequestsValidate = validateQuery(filterRequestsSchema);
 export const filterAgenciesValidate = validateQuery(filterAgenciesSchema);
 export const findWithEmailSchemaValidate = validateQuery(findWithEmailSchema);

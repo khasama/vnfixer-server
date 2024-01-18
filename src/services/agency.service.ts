@@ -5,15 +5,19 @@ import { AgencyDto } from "../dtos/agency/agency.dto";
 import { categoryService } from "./category.service";
 import {
   AgencyRoleType,
+  IRequest,
+  IUser,
+  MIN_TOTAL,
   PaginationOptions,
   PaginationProps,
+  RATE_PER_REQUEST,
   RequestStatus,
 } from "../constants";
-import { Op, Sequelize, where } from "sequelize";
+import { Op } from "sequelize";
 import { UserDto } from "../dtos/user/user.dto";
 import { userService } from "./users.service";
 import { BranchDto } from "../dtos/branch/branch.dto";
-import { branchService } from "./branch.service";
+import { genVnpayUrl } from "../utils/vnpay";
 
 interface IAgencyService {
   getAll(): Promise<Agency[]>;
@@ -31,6 +35,7 @@ interface IAgencyService {
 class AgencyServive implements IAgencyService {
   private agencyModel = Agency;
   private branchModel = Branch;
+  private requestModel = Request;
   private categoryService = categoryService;
   private userService = userService;
 
@@ -193,6 +198,119 @@ class AgencyServive implements IAgencyService {
     }
     const agencyUpdated = await this.getOne({ id });
     return agencyUpdated;
+  }
+
+  async getPaymentInfo(id: number, userId: number) {
+    const agency = await this.agencyModel.findOne({ where: { id } });
+    if (!agency) {
+      throw new createHttpError.BadRequest("Agency not exist !!!");
+    }
+    if (agency.ownerId !== userId) {
+      throw new createHttpError.BadRequest("You not is owner of this agency");
+    }
+    const requests = await this.requestModel.findAll({
+      where: {
+        status: RequestStatus.DONE,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          where: {
+            agencyId: agency.id,
+          },
+        },
+        {
+          model: User,
+          as: "staff",
+          attributes: ["id", "email"],
+        },
+      ],
+    });
+
+    return { agency, requests };
+  }
+
+  async agencyPayment(
+    id: number,
+    user: IUser,
+    requestIds: number[],
+    ipAddr,
+    bankCode: string = "",
+    returnUrl: string
+  ) {
+    const agency = await this.agencyModel.findOne({ where: { id } });
+    if (!agency) {
+      throw new createHttpError.BadRequest("Agency not exist !!!");
+    }
+    if (agency.ownerId !== user.id) {
+      throw new createHttpError.BadRequest("You not is owner of this agency");
+    }
+
+    const requests = await this.requestModel.findAll({
+      where: {
+        status: RequestStatus.DONE,
+      },
+      include: [
+        {
+          model: Branch,
+          as: "branch",
+          where: {
+            agencyId: agency.id,
+          },
+        },
+      ],
+    });
+
+    const allRequestValid = this.checkRequestsValid(requests, requestIds);
+    if (!allRequestValid) {
+      throw new createHttpError.BadRequest("One of list invalid");
+    }
+    const total = requestIds.length * RATE_PER_REQUEST;
+    if (total < MIN_TOTAL) {
+      throw new createHttpError.BadRequest(
+        `Min amount must be than ${MIN_TOTAL}`
+      );
+    }
+
+    await this.changeRequestsToPaymentProcess(requestIds);
+
+    const paymentDescription = `Người dùng ${user.email} đã thanh toán ${total} của ${requestIds.length} yêu cầu cho đại lý ${agency.name}`;
+
+    const paymentUrl = genVnpayUrl(
+      ipAddr,
+      bankCode,
+      total,
+      paymentDescription,
+      returnUrl
+    );
+    return paymentUrl;
+  }
+
+  checkRequestsValid(requests: IRequest[], requestIds: number[]) {
+    const requestsFind: number[] = [];
+    for (const id of requestIds) {
+      if (requests.find((request) => request.id === id)) {
+        requestsFind.push(id);
+      }
+    }
+    return requestsFind.length === requestIds.length;
+  }
+
+  async changeRequestsToPaymentProcess(requestIds: number[]) {
+    const [affectedCount] = await this.requestModel.update(
+      {
+        status: RequestStatus.PAYMENT_PENDING,
+      },
+      {
+        where: {
+          id: requestIds,
+        },
+      }
+    );
+    if (affectedCount !== requestIds.length) {
+      throw new createHttpError.BadRequest("chaneg status error");
+    }
   }
 }
 

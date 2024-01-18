@@ -29,7 +29,6 @@ interface IRequestService {
 
 class RequestServive implements IRequestService {
   private requestModel = Request;
-  private branchService = branchService;
   private categoryService = categoryService;
   private notificationService = notificationService;
 
@@ -184,13 +183,13 @@ class RequestServive implements IRequestService {
     if (status === RequestStatus.DONE) {
       notificationContent = {
         title: "Yêu cầu của bạn đã được hoàn thành",
-        body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được hoàn thành`,
+        body: `Yêu cầu sửa chữa của bạn đã được hoàn thành`,
         data: {},
       };
     } else if (status === RequestStatus.CANCEL) {
       notificationContent = {
         title: "Yêu cầu của bạn đã bị hủy bỏ",
-        body: `Yêu cầu sửa chữa: ${request.title} của bạn đã bị hủy bỏ`,
+        body: `Yêu cầu sửa chữa của bạn đã bị hủy bỏ`,
         data: {},
       };
     } else if (
@@ -199,7 +198,7 @@ class RequestServive implements IRequestService {
     ) {
       notificationContent = {
         title: `Yêu cầu của bạn đã được chuyển về trạng thái ${status}`,
-        body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được chuyển về trạng thái ${status}`,
+        body: `Yêu cầu sửa chữa của bạn đã được chuyển về trạng thái ${status}`,
         data: {},
       };
     }
@@ -235,7 +234,7 @@ class RequestServive implements IRequestService {
     await this.update(requestId, dataUpdate);
     const notificationContent: INotificationContent = {
       title: "Yêu cầu của bạn đã được nhận",
-      body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được nhận bời một nhân viên của đại lý`,
+      body: `Yêu cầu sửa chữa của bạn đã được nhận bời một nhân viên của đại lý`,
       data: {},
     };
     await this.notificationService.send(request.userId, notificationContent);
@@ -259,11 +258,12 @@ class RequestServive implements IRequestService {
       ...request,
       status: RequestStatus.PICKED,
       branchId: user.branchId,
+      pickerId: user.id,
     };
     await this.update(requestId, dataUpdate);
     const notificationContent: INotificationContent = {
       title: "Yêu cầu của bạn đã được chọn",
-      body: `Yêu cầu sửa chữa: ${request.title} của bạn đã được chọn bởi một đại lý sửa chữa`,
+      body: `Yêu cầu sửa chữa của bạn đã được chọn bởi một đại lý sửa chữa`,
       data: {},
     };
     await this.notificationService.send(request.userId, notificationContent);

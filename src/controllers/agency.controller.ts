@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { catchAsync } from "../utils/catch-async";
 import { BaseRespone } from "../utils/base-respone";
-import { HttpError } from "../constants";
+import { HttpError, IUser } from "../constants";
 import { agencyService } from "../services/agency.service";
 
 class AgencyController {
@@ -53,6 +53,31 @@ class AgencyController {
     const { id } = req.params;
     const agency = req.body;
     const result = await this._service.update(parseInt(id), agency);
+    const respone = new BaseRespone("success", HttpError.SUCCESS, result);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
+
+  getPaymentInfo = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { id: userId } = req["user"];
+    const result = await this._service.getPaymentInfo(parseInt(id), userId);
+    const respone = new BaseRespone("success", HttpError.SUCCESS, result);
+    return res.status(HttpError.SUCCESS).json(respone);
+  });
+
+  agencyPayment = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const user: IUser = req["user"];
+    const { requestIds, bankCode, returnUrl } = req.body;
+    const ipAddr = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    const result = await this._service.agencyPayment(
+      parseInt(id),
+      user,
+      requestIds as number[],
+      ipAddr,
+      bankCode as string,
+      returnUrl as string
+    );
     const respone = new BaseRespone("success", HttpError.SUCCESS, result);
     return res.status(HttpError.SUCCESS).json(respone);
   });

@@ -1,3 +1,6 @@
+export const RATE_PER_REQUEST = 2000;
+export const MIN_TOTAL = 10000;
+
 export enum RoleType {
   ADMIN = "ADMIN",
   CUSTOMER = "CUSTOMER",
@@ -23,6 +26,8 @@ export enum RequestStatus {
   ACCEPT = "ACCEPT",
   DONE = "DONE",
   CANCEL = "CANCEL",
+  PAYMENT_PENDING = "PAYMENT_PENDING",
+  PAID = "PAID",
 }
 
 export enum StaffRequestStatus {
@@ -30,6 +35,25 @@ export enum StaffRequestStatus {
   ACCEPT = "ACCEPT",
   REJECT = "REJECT",
 }
+
+export enum CategoryKey {
+  XE_MAY = "category.xemay",
+  DO_GIA_DUNG = "category.dogiadung",
+  NOI_THAT = "category.noithat",
+  DIEN_LANH = "category.dienlanh",
+  DIEN_NUOC = "category.diennuoc",
+  AN_NINH = "category.anninh",
+  VAN_PHONG = "category.vanphong",
+}
+
+export enum Intent {
+  HELLO = "greetings.hello",
+  BYE = "greetings.bye",
+  LIST_CATEGORIES = "list.categories",
+  NONE = "None",
+}
+
+export type ChatbotIntent = Intent | CategoryKey;
 
 export const cities = [
   "An Giang",
@@ -128,6 +152,7 @@ export interface IUser {
 export interface ICategory {
   id?: number;
   name: string;
+  key: string;
   description?: string;
 }
 
@@ -135,6 +160,9 @@ export interface IAgency {
   id?: number;
   name: string;
   description?: string;
+  website?: string;
+  zalo?: string;
+  fanpage?: string;
   categoryId: number;
   ownerId: number;
   logo: string;
@@ -148,15 +176,16 @@ export interface IAgencyCategory {
 export interface IBranch {
   id?: number;
   city: string;
+  district: string;
   address: string;
   agencyId: number;
 }
 
 export interface IRequest {
   id?: number;
-  title: string;
   description: string;
   city: string;
+  district: string;
   location: string;
   expectDate: string | string[];
   status: string;
@@ -167,6 +196,7 @@ export interface IRequest {
   customerEmail: string;
   userId: number;
   staffId: number | null;
+  pickerId: number | null;
 }
 
 export interface IStaffRequest {
@@ -213,4 +243,11 @@ export interface PaginationOptions {
   sort: string;
   page: number;
   limit: number;
+}
+
+export interface IPaymentInformation {
+  id?: number;
+  userId: number;
+  agencyId: number;
+  total: number;
 }

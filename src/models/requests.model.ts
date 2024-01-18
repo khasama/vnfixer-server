@@ -4,9 +4,9 @@ import { IRequest, RequestStatus, cities } from "../constants";
 
 export class Request extends Model implements IRequest {
   id: number;
-  title: string;
   description: string;
   city: string;
+  district: string;
   location: string;
   expectDate: string;
   status: string;
@@ -17,6 +17,7 @@ export class Request extends Model implements IRequest {
   customerEmail: string;
   userId: number;
   staffId: number | null;
+  pickerId: number | null;
 }
 
 Request.init(
@@ -26,15 +27,15 @@ Request.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    title: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     description: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT("medium"),
     },
     city: {
       type: DataTypes.ENUM({ values: cities }),
+      allowNull: false,
+    },
+    district: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     location: {
@@ -74,6 +75,10 @@ Request.init(
       allowNull: true,
     },
     staffId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    pickerId: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },

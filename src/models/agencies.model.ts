@@ -7,6 +7,9 @@ export class Agency extends Model implements IAgency {
   id: number;
   name: string;
   description: string;
+  website: string;
+  zalo: string;
+  fanpage: string;
   logo: string;
   categoryId: number;
   ownerId: number;
@@ -24,6 +27,15 @@ Agency.init(
       allowNull: false,
     },
     description: {
+      type: DataTypes.TEXT("medium"),
+    },
+    website: {
+      type: DataTypes.STRING,
+    },
+    zalo: {
+      type: DataTypes.STRING,
+    },
+    fanpage: {
       type: DataTypes.STRING,
     },
     logo: {

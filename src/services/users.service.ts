@@ -142,9 +142,7 @@ class UserServive implements IUserService {
   async findWithEmail(email: string): Promise<User[]> {
     const users = await this.userModel.findAll({
       where: {
-        email: {
-          [Op.like]: `%${email}%`,
-        },
+        email,
       },
       attributes: ["id", "email", "branchId", "imageUrl"],
       include: [

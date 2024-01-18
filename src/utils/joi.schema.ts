@@ -12,12 +12,14 @@ export const authSchema = Joi.object({
 export const categorySchema = Joi.object({
   name: Joi.string().trim().required(),
   description: Joi.string().trim(),
+  key: Joi.string().trim().required(),
 });
 
 export const branchSchema = Joi.object({
   city: Joi.string()
     .trim()
     .valid(...cities),
+  district: Joi.string().trim().required(),
   address: Joi.string().trim(),
   agencyId: Joi.number().required(),
 });
@@ -25,8 +27,12 @@ export const branchSchema = Joi.object({
 export const agencySchema = Joi.object({
   name: Joi.string().trim().required(),
   description: Joi.string().trim(),
+  website: Joi.string().trim().optional(),
+  zalo: Joi.string().trim().optional(),
+  fanpage: Joi.string().trim().optional(),
   categoryId: Joi.number().required(),
   branch: Joi.object({
+    district: Joi.string().trim().required(),
     city: Joi.string()
       .trim()
       .valid(...cities),
@@ -42,7 +48,7 @@ export const updateInfoSchema = Joi.object({
 });
 
 export const requestSchema = Joi.object({
-  title: Joi.string().trim().required(),
+  // title: Joi.string().trim().required(),
   description: Joi.string().trim(),
   location: Joi.string().trim().required(),
   expectDate: Joi.array().items(Joi.date().format("YYYY-MM-DD").required()),
@@ -52,6 +58,7 @@ export const requestSchema = Joi.object({
   customerPhone: Joi.string().trim().required(),
   customerName: Joi.string().trim().required(),
   customerEmail: Joi.string().trim().required(),
+  district: Joi.string().trim().required(),
   city: Joi.string()
     .trim()
     .valid(...cities),
@@ -62,6 +69,7 @@ export const filterRequestsSchema = Joi.object({
   page: Joi.number().optional(),
   category: Joi.number().optional(),
   branchId: Joi.number().optional(),
+  staffId: Joi.number().optional(),
   status: Joi.string()
     .trim()
     .valid(...Object.values(RequestStatus))
@@ -84,6 +92,7 @@ export const filterAgenciesSchema = Joi.object({
 
 export const addStaffSchema = Joi.object({
   userId: Joi.number().required(),
+  branchId: Joi.number().required(),
   role: Joi.string()
     .trim()
     .valid(...Object.values(AgencyRoleType))
@@ -96,4 +105,14 @@ export const updateNotiTokenSchema = Joi.object({
 
 export const findWithEmailSchema = Joi.object({
   email: Joi.string().trim().required(),
+});
+
+export const chatbotSchema = Joi.object({
+  question: Joi.string().trim().required(),
+});
+
+export const agencyPaymentSchema = Joi.object({
+  requestIds: Joi.array().items(Joi.number()),
+  returnUrl: Joi.string().trim().required(),
+  bankCode: Joi.string().trim(),
 });

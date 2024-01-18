@@ -2,9 +2,9 @@ import { IRequest } from "../../constants";
 
 export class RequestDto implements IRequest {
   id?: number;
-  title: string;
   description: string;
   city: string;
+  district: string;
   location: string;
   expectDate: string | string[];
   status: string;
@@ -15,4 +15,5 @@ export class RequestDto implements IRequest {
   customerEmail: string;
   userId: number;
   staffId: number;
+  pickerId: number;
 }
